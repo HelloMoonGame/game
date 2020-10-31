@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+  - node
+
+cache:
+  yarn: true
+  directories:
+  - src/node_modules
+
+before_install:
+  - cd src
+
+install:
+  - yarn install
+
+script:
+  - yarn run lint
+  - yarn run type-check
+  - yarn run test
+  - yarn run build
+
+deploy:
+  provider: netlify
+  site: "cb835850-5dbd-4b9f-b064-e1bace6ef24f"
+  dir: "../dist/"
+  prod: true
+  edge: true
+  on:
+    branch: master
