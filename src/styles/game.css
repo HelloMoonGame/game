@@ -1,0 +1,8 @@
+html,
+body {
+  height: 100%;
+}
+
+#__next {
+  min-height: 100%;
+}
