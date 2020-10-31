@@ -1,0 +1,62 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Home page matches snapshot 1`] = `
+<DocumentFragment>
+  <header>
+    <header
+      class="MuiPaper-root MuiAppBar-root MuiAppBar-positionFixed MuiAppBar-colorPrimary mui-fixed MuiPaper-elevation4"
+    >
+      <div
+        class="MuiToolbar-root MuiToolbar-regular MuiToolbar-gutters"
+      >
+        <h6
+          class="MuiTypography-root MuiTypography-h6"
+        >
+          Hello Moon
+        </h6>
+      </div>
+    </header>
+  </header>
+  <main
+    class="makeStyles-pageMain-1"
+  >
+    <canvas
+      class="makeStyles-canvas-3"
+      height="0"
+      width="0"
+    />
+  </main>
+  <footer
+    class="makeStyles-pageFooter-2"
+  >
+    <div
+      class="MuiBottomNavigation-root"
+    >
+      <button
+        class="MuiButtonBase-root MuiBottomNavigationAction-root"
+        tabindex="0"
+        type="button"
+      >
+        <span
+          class="MuiBottomNavigationAction-wrapper"
+        >
+          <span
+            aria-hidden="true"
+            class="material-icons MuiIcon-root"
+          >
+            location_on
+          </span>
+          <span
+            class="MuiBottomNavigationAction-label"
+          >
+            Explore
+          </span>
+        </span>
+        <span
+          class="MuiTouchRipple-root"
+        />
+      </button>
+    </div>
+  </footer>
+</DocumentFragment>
+`;
