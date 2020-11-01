@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { LayerProps } from './LayerProps'
 
 const draw = (ctx, width, height) => {
   if (ctx) {
@@ -8,25 +9,18 @@ const draw = (ctx, width, height) => {
   }
 }
 
-const BackgroundLayer = (props) => {
-  const canvasRef = useRef(null)
-
-  const resized = () => {
-    const canvas = canvasRef.current
-    const context = canvas.getContext('2d')
-    canvas.width = canvas.clientWidth
-    canvas.height = canvas.clientHeight
-    draw(context, canvas.clientWidth, canvas.clientHeight)
-  }
+const BackgroundLayer = ({ className, width, height }: LayerProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
-    window.addEventListener('resize', resized)
-    resized()
-    return () => canvas.removeEventListener('resize', resized)
-  })
+    const context = canvas.getContext('2d')
+    canvas.width = width
+    canvas.height = height
+    draw(context, width, height)
+  }, [width, height])
 
-  return <canvas ref={canvasRef} {...props} />
+  return <canvas ref={canvasRef} className={className} />
 }
 
 export default BackgroundLayer

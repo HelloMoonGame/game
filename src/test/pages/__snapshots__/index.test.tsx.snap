@@ -25,6 +25,9 @@ exports[`Home page matches snapshot 1`] = `
       height="0"
       width="0"
     />
+    <div
+      class="makeStyles-canvas-3"
+    />
   </main>
   <footer
     class="makeStyles-pageFooter-2"

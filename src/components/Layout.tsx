@@ -60,7 +60,6 @@ const Layout = ({ children, title }: Props) => {
             <Typography variant="h6">Hello Moon</Typography>
           </Toolbar>
         </AppBar>
-        {/* <div className={classes.offset}></div> */}
       </header>
       <main className={classes.pageMain}>{children}</main>
       <footer className={classes.pageFooter}>
