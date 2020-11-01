@@ -43,7 +43,7 @@ const Layout = ({ children, title }: Props) => {
         <title>{title ? title + ' - Hello Moon' : 'Hello Moon'}</title>
         <meta
           name="viewport"
-          content="initial-scale=1, width=device-width, user-scalable=no"
+          content="initial-scale=1.0, width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
         />
         <link
           rel="stylesheet"
