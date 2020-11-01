@@ -9,16 +9,20 @@ const draw = (ctx, width, height) => {
   }
 }
 
-const BackgroundLayer = ({ className, width, height }: LayerProps) => {
+const BackgroundLayer = ({
+  className,
+  canvasWidth,
+  canvasHeight,
+}: LayerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
-    canvas.width = width
-    canvas.height = height
-    draw(context, width, height)
-  }, [width, height])
+    canvas.width = canvasWidth
+    canvas.height = canvasHeight
+    draw(context, canvasWidth, canvasHeight)
+  }, [canvasWidth, canvasHeight])
 
   return <canvas ref={canvasRef} className={className} />
 }

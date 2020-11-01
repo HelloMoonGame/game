@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { makeStyles } from '@material-ui/core'
 import BackgroundLayer from './BackgroundLayer'
+import InfrastructureLayer from './InfrastructureLayer'
 
 const useStyles = makeStyles(() => ({
   canvas: {
@@ -14,13 +15,13 @@ const GameMap = () => {
   const classes = useStyles(),
     divRef = useRef<HTMLDivElement>(null)
 
-  const [width, setWidth] = useState(0)
-  const [height, setHeight] = useState(0)
+  const [canvasWidth, setCanvasWidth] = useState(0)
+  const [canvasHeight, setCanvasHeight] = useState(0)
 
   const resized = () => {
     const div = divRef.current
-    setWidth(div.clientWidth)
-    setHeight(div.clientHeight)
+    setCanvasWidth(div.clientWidth * 4)
+    setCanvasHeight(div.clientHeight * 4)
   }
 
   useEffect(() => {
@@ -33,8 +34,17 @@ const GameMap = () => {
     <>
       <BackgroundLayer
         className={classes.canvas}
-        width={width}
-        height={height}
+        canvasWidth={canvasWidth}
+        canvasHeight={canvasHeight}
+        lotWidth={400}
+        lotHeight={400}
+      />
+      <InfrastructureLayer
+        className={classes.canvas}
+        canvasWidth={canvasWidth}
+        canvasHeight={canvasHeight}
+        lotWidth={400}
+        lotHeight={400}
       />
       <div className={classes.canvas} ref={divRef}></div>
     </>
