@@ -41,7 +41,10 @@ const Layout = ({ children, title }: Props) => {
     <>
       <Head>
         <title>{title ? title + ' - Hello Moon' : 'Hello Moon'}</title>
-        <meta name="viewport" content="initial-scale=1, width=device-width" />
+        <meta
+          name="viewport"
+          content="initial-scale=1, width=device-width, user-scalable=no"
+        />
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap"
