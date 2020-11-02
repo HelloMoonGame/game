@@ -17,16 +17,55 @@ const GameMap = () => {
 
   const [canvasWidth, setCanvasWidth] = useState(0)
   const [canvasHeight, setCanvasHeight] = useState(0)
+  const [zoomLevel, _setZoomLevel] = useState(400)
+  const zoomLevelRef = React.useRef(zoomLevel)
+  const [minZoomLevel, _setMinZoomLevel] = useState(400)
+  const minZoomLevelRef = React.useRef(minZoomLevel)
+  const [maxZoomLevel, _setMaxZoomLevel] = useState(400)
+  const maxZoomLevelRef = React.useRef(maxZoomLevel)
+
+  const setMinZoomLevel = (value) => {
+    _setMinZoomLevel(value)
+    minZoomLevelRef.current = value
+  }
+  const setMaxZoomLevel = (value) => {
+    _setMaxZoomLevel(value)
+    maxZoomLevelRef.current = value
+  }
+
+  const setZoomLevel = (value) => {
+    value = Math.ceil(
+      Math.max(
+        minZoomLevelRef.current,
+        Math.min(maxZoomLevelRef.current, value)
+      )
+    )
+    _setZoomLevel(value)
+
+    zoomLevelRef.current = value
+  }
 
   const resized = () => {
     const div = divRef.current
     setCanvasWidth(div.clientWidth * 4)
     setCanvasHeight(div.clientHeight * 4)
+    setMinZoomLevel((Math.min(div.clientWidth, div.clientHeight) / 11) * 4)
+    setMaxZoomLevel((Math.min(div.clientWidth, div.clientHeight) / 1) * 4)
+    setZoomLevel(zoomLevelRef.current)
+  }
+
+  const zoom = (event: WheelEvent) => {
+    event.preventDefault()
+    setZoomLevel(zoomLevelRef.current * (event.deltaY > 0 ? 0.85 : 1.15))
   }
 
   useEffect(() => {
+    const div = divRef.current
+
     window.addEventListener('resize', resized)
     resized()
+    setZoomLevel((Math.min(div.clientWidth, div.clientHeight) / 5) * 4)
+    div.onwheel = zoom
     return () => window.removeEventListener('resize', resized)
   }, [])
 
@@ -36,15 +75,15 @@ const GameMap = () => {
         className={classes.canvas}
         canvasWidth={canvasWidth}
         canvasHeight={canvasHeight}
-        lotWidth={400}
-        lotHeight={400}
+        lotWidth={zoomLevel}
+        lotHeight={zoomLevel}
       />
       <InfrastructureLayer
         className={classes.canvas}
         canvasWidth={canvasWidth}
         canvasHeight={canvasHeight}
-        lotWidth={400}
-        lotHeight={400}
+        lotWidth={zoomLevel}
+        lotHeight={zoomLevel}
       />
       <div className={classes.canvas} ref={divRef}></div>
     </>
