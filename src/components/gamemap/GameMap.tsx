@@ -77,6 +77,8 @@ const GameMap = () => {
         canvasHeight={canvasHeight}
         lotWidth={zoomLevel}
         lotHeight={zoomLevel}
+        centerLotX={0}
+        centerLotY={0}
       />
       <InfrastructureLayer
         className={classes.canvas}
@@ -84,6 +86,8 @@ const GameMap = () => {
         canvasHeight={canvasHeight}
         lotWidth={zoomLevel}
         lotHeight={zoomLevel}
+        centerLotX={0}
+        centerLotY={0}
       />
       <div className={classes.canvas} ref={divRef}></div>
     </>

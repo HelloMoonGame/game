@@ -4,4 +4,6 @@ export interface LayerProps {
   canvasHeight: number
   lotWidth: number
   lotHeight: number
+  centerLotX: number
+  centerLotY: number
 }
