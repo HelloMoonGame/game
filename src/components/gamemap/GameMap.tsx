@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { makeStyles } from '@material-ui/core'
 import BackgroundLayer from './BackgroundLayer'
 import InfrastructureLayer from './InfrastructureLayer'
+import CharacterLayer from './CharacterLayer'
 
 const useStyles = makeStyles(() => ({
   canvas: {
@@ -81,6 +82,15 @@ const GameMap = () => {
         centerLotY={0}
       />
       <InfrastructureLayer
+        className={classes.canvas}
+        canvasWidth={canvasWidth}
+        canvasHeight={canvasHeight}
+        lotWidth={zoomLevel}
+        lotHeight={zoomLevel}
+        centerLotX={0}
+        centerLotY={0}
+      />
+      <CharacterLayer
         className={classes.canvas}
         canvasWidth={canvasWidth}
         canvasHeight={canvasHeight}
