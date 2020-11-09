@@ -173,7 +173,7 @@ const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
         ctx.textBaseline = 'middle'
         ctx.font = '40px Arial'
         ctx.fillText(
-          `${lotX}:${lotY}`,
+          `${lotX},${lotY}`,
           lotDetails.x + lotDetails.width / 2,
           lotDetails.y + lotDetails.height / 2,
           80
