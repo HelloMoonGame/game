@@ -9,6 +9,7 @@ cache:
 
 before_install:
   - cd src
+  - echo "NEXT_PUBLIC_CHARACTERAPI_URL=$NEXT_PUBLIC_CHARACTERAPI_URL" >> .env.production
 
 install:
   - yarn install
