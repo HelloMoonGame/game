@@ -6,6 +6,7 @@ import { Empty, LocationUpdateResponse } from '../../grpc/location_pb'
 
 let characters = []
 let latestProps: LayerProps
+let currentUser: string
 
 const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
   if (ctx) {
@@ -15,8 +16,6 @@ const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
     const centerX = props.canvasWidth / 2,
       centerY = props.canvasHeight / 2,
       lotSize = Math.min(props.lotWidth, props.lotHeight)
-
-    ctx.fillStyle = '#000'
 
     characters.forEach((c) => {
       const offsetX = (c.x - props.centerLotX) * props.lotWidth
@@ -28,6 +27,7 @@ const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
       const x = centerX + offsetX,
         y = centerY + offsetY
 
+      ctx.fillStyle = currentUser === c.characterId ? '#0F0' : '#000'
       ctx.beginPath()
       ctx.arc(x, y, lotSize * 0.05, 0, 2 * Math.PI)
       ctx.fill()
@@ -65,6 +65,8 @@ const CharacterLayer = (props: LayerProps) => {
     const call = locationService.subscribe(request)
     call.on('data', function (response: LocationUpdateResponse) {
       response.getLocationupdatesList().forEach((locationUpdate) => {
+        if (!characters.length) currentUser = locationUpdate.getCharacterid()
+
         const current = characters.find(
           (c) => c.characterId === locationUpdate.getCharacterid()
         )
