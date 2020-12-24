@@ -5,9 +5,11 @@ import { LocationClient } from '../../grpc/LocationServiceClientPb'
 import { Empty, LocationUpdateResponse } from '../../grpc/location_pb'
 
 let characters = []
+let latestProps: LayerProps
 
 const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
   if (ctx) {
+    latestProps = props
     ctx.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
 
     const centerX = props.canvasWidth / 2,
@@ -87,7 +89,7 @@ const CharacterLayer = (props: LayerProps) => {
 
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
-      redraw(context, props)
+      redraw(context, latestProps)
     })
   }, [])
 
