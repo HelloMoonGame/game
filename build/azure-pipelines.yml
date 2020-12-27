@@ -36,7 +36,7 @@ steps:
   displayName: 'Yarn install'
 
 - script: |
-    echo "NEXT_PUBLIC_CHARACTERAPI_URL=$NEXT_PUBLIC_CHARACTERAPI_URL" >> .env.production
+    echo "NEXT_PUBLIC_CHARACTERAPI_URL=$(NEXT_PUBLIC_CHARACTERAPI_URL)" >> .env.production
   workingDirectory: src
   displayName: 'Create environment file'
 
