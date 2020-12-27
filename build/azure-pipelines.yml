@@ -1,0 +1,64 @@
+name: $(BuildID)
+
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - build/azure-pipelines.yml
+    - src/*
+
+pr:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - build/azure-pipelines.yml
+    - src/*
+
+resources:
+- repo: self
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '12.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    yarn install
+  workingDirectory: src
+  displayName: 'Yarn install'
+
+- script: |
+    echo "NEXT_PUBLIC_CHARACTERAPI_URL=$NEXT_PUBLIC_CHARACTERAPI_URL" >> .env.production
+  workingDirectory: src
+  displayName: 'Create environment file'
+
+- script: |
+    yarn run lint
+    yarn run type-check
+    yarn run test
+  workingDirectory: src
+  displayName: 'Test'
+
+- script: |
+    yarn run build
+  workingDirectory: src
+  displayName: 'Build'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/dist'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/dist'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)/dist'
+    artifactName: game
+  displayName: 'Publish artifact'
