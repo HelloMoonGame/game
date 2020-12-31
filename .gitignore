@@ -13,7 +13,8 @@
 /src/out/
 
 # production
-/dist
+/src/out_publish
+/src/out_functions
 
 # misc
 .DS_Store
