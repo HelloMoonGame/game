@@ -37,6 +37,8 @@ steps:
 
 - script: |
     echo "NEXT_PUBLIC_CHARACTERAPI_URL=$(NEXT_PUBLIC_CHARACTERAPI_URL)" >> .env.production
+    echo "NEXTAUTH_URL=$(NEXTAUTH_URL)" >> .env.production
+    echo "IdentityServer4_Domain=$(IdentityServer4_Domain)" >> .env.production
   workingDirectory: src
   displayName: 'Create environment file'
 
