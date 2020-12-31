@@ -56,7 +56,10 @@ steps:
 
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)/dist'
+    SourceFolder: '$(Build.SourcesDirectory)/src/'
+    Contents: |
+      out_publish/**
+      out_functions/**
     TargetFolder: '$(Build.ArtifactStagingDirectory)/dist'
 
 - task: PublishBuildArtifacts@1
