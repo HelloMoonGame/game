@@ -9,7 +9,7 @@ describe('Home page', () => {
   it('matches snapshot', () => {
     const mockSession: Session = {
       expires: '1',
-      user: { email: 'a', name: 'Delta', image: 'c' },
+      user: { email: null, name: 'alice@hellomoon.nl', image: null },
     }
 
     ;(client.useSession as jest.Mock).mockReturnValueOnce([mockSession, false])

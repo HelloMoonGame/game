@@ -35,7 +35,7 @@ exports[`Home page matches snapshot 1`] = `
               <p
                 class="MuiTypography-root makeStyles-username-3 MuiTypography-body1"
               >
-                Delta
+                alice@hellomoon.nl
               </p>
             </span>
             <span
