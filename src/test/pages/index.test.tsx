@@ -12,7 +12,7 @@ describe('Home page', () => {
       user: { email: null, name: 'alice@hellomoon.nl', image: null },
     }
 
-    ;(client.useSession as jest.Mock).mockReturnValueOnce([mockSession, false])
+    client.useSession.mockReturnValueOnce([mockSession, false])
 
     const { asFragment } = render(<Home />, {})
     expect(asFragment()).toMatchSnapshot()
