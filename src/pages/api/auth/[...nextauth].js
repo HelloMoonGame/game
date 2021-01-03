@@ -12,6 +12,20 @@ const options = {
       clientSecret: process.env.IdentityServer4_CLIENT_SECRET,
     }),
   ],
+  callbacks: {
+    session: async (session, user) => {
+      session.accessToken = user.accessToken
+      session.subject = user.subject
+      return Promise.resolve(session)
+    },
+    jwt: async (token, user, account) => {
+      if (account) {
+        token.accessToken = account.accessToken
+        token.subject = account.id
+      }
+      return Promise.resolve(token)
+    },
+  },
 }
 
 export default (req, res) => NextAuth(req, res, options)
