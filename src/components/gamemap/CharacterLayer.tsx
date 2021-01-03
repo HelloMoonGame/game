@@ -66,13 +66,12 @@ const CharacterLayer = (props: LayerProps) => {
     const request = new Empty()
 
     characters = []
+    currentUser = session.subject
     const call = locationService.subscribe(request, {
       Authorization: 'Bearer ' + session.accessToken,
     })
     call.on('data', function (response: LocationUpdateResponse) {
       response.getLocationupdatesList().forEach((locationUpdate) => {
-        if (!characters.length) currentUser = locationUpdate.getCharacterid()
-
         const current = characters.find(
           (c) => c.characterId === locationUpdate.getCharacterid()
         )
