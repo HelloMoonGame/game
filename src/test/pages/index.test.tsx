@@ -12,7 +12,7 @@ describe('Home page', () => {
       user: { email: null, name: 'alice@hellomoon.nl', image: null },
     }
 
-    client.useSession.mockReturnValueOnce([mockSession, false])
+    client.useSession.mockReturnValue([mockSession, false])
 
     const { asFragment } = render(<Home />, {})
     expect(asFragment()).toMatchSnapshot()
