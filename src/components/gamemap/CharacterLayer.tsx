@@ -3,6 +3,7 @@ import { LayerProps } from './LayerProps'
 
 import { LocationClient } from '../../grpc/LocationServiceClientPb'
 import { Empty, LocationUpdateResponse } from '../../grpc/location_pb'
+import { useSession } from 'next-auth/client'
 
 let characters = []
 let latestProps: LayerProps
@@ -37,6 +38,7 @@ const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
 
 const CharacterLayer = (props: LayerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [session] = useSession()
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -53,6 +55,8 @@ const CharacterLayer = (props: LayerProps) => {
   }, [props.lotWidth, props.lotHeight])
 
   useEffect(() => {
+    if (!session) return
+
     const locationService = new LocationClient(
       process.env.NEXT_PUBLIC_CHARACTERAPI_URL,
       null,
@@ -62,7 +66,9 @@ const CharacterLayer = (props: LayerProps) => {
     const request = new Empty()
 
     characters = []
-    const call = locationService.subscribe(request)
+    const call = locationService.subscribe(request, {
+      Authorization: 'Bearer ' + session.accessToken,
+    })
     call.on('data', function (response: LocationUpdateResponse) {
       response.getLocationupdatesList().forEach((locationUpdate) => {
         if (!characters.length) currentUser = locationUpdate.getCharacterid()
@@ -93,7 +99,7 @@ const CharacterLayer = (props: LayerProps) => {
       const context = canvas.getContext('2d')
       redraw(context, latestProps)
     })
-  }, [])
+  }, [session])
 
   return <canvas ref={canvasRef} className={props.className} />
 }
