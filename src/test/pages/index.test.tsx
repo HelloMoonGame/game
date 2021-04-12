@@ -1,20 +1,46 @@
 import React from 'react'
-import client, { Session } from 'next-auth/client'
-import { render } from '../testUtils'
+import { act, render } from '../testUtils'
 import { Home } from '../../pages/index'
 
-jest.mock('next-auth/client')
+jest.mock(
+  '../../services/AuthService',
+  () => {
+    return {
+      getInstance: jest.fn(() => {
+        return {
+          getUserOrLogin: jest.fn(() =>
+            Promise.resolve({
+              access_token: '123',
+              profile: {
+                aud: '',
+                exp: 0,
+                iat: 0,
+                iss: '',
+                sub: '1234-56789-0123-4567',
+                name: 'alice@hellomoon.nl',
+              },
+              id_token: '',
+              session_state: '',
+              refresh_token: '',
+              scope: '',
+              expires_at: 0,
+              state: '',
+              token_type: '',
+            })
+          ),
+        }
+      }),
+    }
+  },
+  { virtual: true }
+)
 
 describe('Home page', () => {
-  it('matches snapshot', () => {
-    const mockSession: Session = {
-      expires: '1',
-      user: { email: null, name: 'alice@hellomoon.nl', image: null },
-    }
-
-    client.useSession.mockReturnValue([mockSession, false])
-
-    const { asFragment } = render(<Home />, {})
+  it('matches snapshot', async () => {
+    let asFragment
+    await act(() => {
+      asFragment = render(<Home />, {}).asFragment
+    })
     expect(asFragment()).toMatchSnapshot()
   })
 })
