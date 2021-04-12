@@ -37,8 +37,8 @@ steps:
 
 - script: |
     echo "NEXT_PUBLIC_CHARACTERAPI_URL=$(NEXT_PUBLIC_CHARACTERAPI_URL)" >> .env.production
-    echo "NEXTAUTH_URL=$(NEXTAUTH_URL)" >> .env.production
-    echo "IdentityServer4_Domain=$(IdentityServer4_Domain)" >> .env.production
+    echo "NEXT_PUBLIC_URL=$(NEXTAUTH_URL)" >> .env.production
+    echo "NEXT_PUBLIC_AUTH_AUTHORITY=$(IdentityServer4_Domain)" >> .env.production
   workingDirectory: src
   displayName: 'Create environment file'
 
@@ -54,13 +54,15 @@ steps:
   workingDirectory: src
   displayName: 'Build'
 
+- script: |
+    yarn run export
+  workingDirectory: src
+  displayName: 'Export'
+
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)/src/'
-    Contents: |
-      out_publish/**
-      out_functions/**
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/dist'
+    SourceFolder: '$(Build.SourcesDirectory)/src/out'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/dist/out_publish'
 
 - task: PublishBuildArtifacts@1
   inputs:

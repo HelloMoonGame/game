@@ -1,5 +1,4 @@
-import React, { ReactNode, useEffect } from 'react'
-import { signIn, signOut, useSession } from 'next-auth/client'
+import React, { ReactNode, useEffect, useState } from 'react'
 import Head from 'next/head'
 import {
   AppBar,
@@ -13,6 +12,8 @@ import {
   Toolbar,
   Typography,
 } from '@material-ui/core'
+import AuthService from '../services/AuthService'
+import { User } from 'oidc-client'
 
 type Props = {
   children?: ReactNode
@@ -47,12 +48,6 @@ const useStyles = makeStyles((theme) => ({
 const Layout = ({ children, title }: Props) => {
   const classes = useStyles()
 
-  const [session, loading] = useSession()
-
-  useEffect(() => {
-    if (!session && !loading) signIn('identity-server4')
-  }, [session, loading])
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 
@@ -64,7 +59,17 @@ const Layout = ({ children, title }: Props) => {
     setAnchorEl(null)
   }
 
-  if (!session) return <></>
+  const [currentUser, setCurrentUser] = useState<User>()
+  useEffect(() => {
+    const authService = AuthService.getInstance()
+    authService.getUserOrLogin().then((user) => setCurrentUser(user))
+  }, [])
+
+  const signOut = () => {
+    AuthService.getInstance().logout()
+  }
+
+  if (!currentUser) return <></>
 
   return (
     <>
@@ -89,39 +94,37 @@ const Layout = ({ children, title }: Props) => {
             <Typography variant="h6" className={classes.title}>
               Hello Moon
             </Typography>
-            {session && (
-              <div>
-                <IconButton
-                  aria-label="account of current user"
-                  aria-controls="menu-appbar"
-                  aria-haspopup="true"
-                  onClick={handleMenu}
-                  color="inherit"
-                >
-                  <Icon>account_circle</Icon>
-                  <Typography variant="body1" className={classes.username}>
-                    {session.user.name}
-                  </Typography>
-                </IconButton>
-                <Menu
-                  id="menu-appbar"
-                  anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  open={open}
-                  onClose={handleClose}
-                >
-                  <MenuItem onClick={signOut}>Logout</MenuItem>
-                </Menu>
-              </div>
-            )}
+            <div>
+              <IconButton
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <Icon>account_circle</Icon>
+                <Typography variant="body1" className={classes.username}>
+                  {currentUser.profile.name}
+                </Typography>
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={open}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={signOut}>Logout</MenuItem>
+              </Menu>
+            </div>
           </Toolbar>
         </AppBar>
       </header>

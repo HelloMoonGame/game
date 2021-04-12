@@ -1,6 +1,5 @@
 import React from 'react'
 import { AppProps } from 'next/app'
-import { Provider } from 'next-auth/client'
 import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core'
 import '../styles/game.css'
 
@@ -17,9 +16,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <React.Fragment>
       <CssBaseline />
       <ThemeProvider theme={theme}>
-        <Provider session={pageProps.session}>
-          <Component {...pageProps} />
-        </Provider>
+        <Component {...pageProps} />
       </ThemeProvider>
     </React.Fragment>
   )
