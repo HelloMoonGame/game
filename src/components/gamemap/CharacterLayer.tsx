@@ -4,12 +4,16 @@ import AuthService from '../../services/AuthService'
 import { User } from 'oidc-client'
 
 import { LocationClient } from '../../grpc/LocationServiceClientPb'
-import { Empty, LocationUpdateResponse } from '../../grpc/location_pb'
+import {
+  Empty,
+  LocationUpdate,
+  LocationUpdateResponse,
+} from '../../grpc/location_pb'
 import { StatusCode } from 'grpc-web'
 
 let characters = []
 let latestProps: LayerProps
-let currentUser: string
+let currentUserId: string
 
 const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
   if (ctx) {
@@ -30,7 +34,7 @@ const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
       const x = centerX + offsetX,
         y = centerY + offsetY
 
-      ctx.fillStyle = currentUser === c.characterId ? '#0F0' : '#000'
+      ctx.fillStyle = currentUserId === c.characterId ? '#0F0' : '#000'
       ctx.beginPath()
       ctx.arc(x, y, lotSize * 0.05, 0, 2 * Math.PI)
       ctx.fill()
@@ -40,11 +44,11 @@ const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
 
 const CharacterLayer = (props: LayerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [user, setUser] = useState<User>()
+  const [currentUser, setCurrentUser] = useState<User>()
 
   useEffect(() => {
     const authService = AuthService.getInstance()
-    authService.getUserOrLogin().then((user) => setUser(user))
+    authService.getUserOrLogin().then((user) => setCurrentUser(user))
   }, [])
 
   useEffect(() => {
@@ -61,8 +65,43 @@ const CharacterLayer = (props: LayerProps) => {
     redraw(context, props)
   }, [props.lotWidth, props.lotHeight])
 
+  function reAuthenticate() {
+    const authService = AuthService.getInstance()
+    authService
+      .renewToken()
+      .then((user) => {
+        if (user && user.access_token) setCurrentUser(user)
+      })
+      .catch(() => {
+        authService.login()
+      })
+  }
+
+  function handleLocationUpdate(locationUpdate: LocationUpdate) {
+    const current = characters.find(
+      (c) => c.characterId === locationUpdate.getCharacterid()
+    )
+    if (!locationUpdate.getOnline()) {
+      characters = characters.filter((c) => c !== current)
+    } else {
+      if (current) {
+        current.x = locationUpdate.getX()
+        current.y = locationUpdate.getY()
+      } else {
+        characters = [
+          ...characters,
+          {
+            characterId: locationUpdate.getCharacterid(),
+            x: locationUpdate.getX(),
+            y: locationUpdate.getY(),
+          },
+        ]
+      }
+    }
+  }
+
   useEffect(() => {
-    if (!user) return
+    if (!currentUser) return
 
     const locationService = new LocationClient(
       process.env.NEXT_PUBLIC_CHARACTERAPI_URL,
@@ -75,52 +114,23 @@ const CharacterLayer = (props: LayerProps) => {
     characters = []
 
     const call = locationService.subscribe(request, {
-      Authorization: 'Bearer ' + user.access_token,
+      Authorization: 'Bearer ' + currentUser.access_token,
     })
     call.on('error', function (e) {
       if (e.code === StatusCode.UNAUTHENTICATED) {
-        const authService = AuthService.getInstance()
-        authService
-          .renewToken()
-          .then((user) => {
-            if (user && user.access_token) setUser(user)
-          })
-          .catch(() => {
-            authService.login()
-          })
+        reAuthenticate()
       }
     })
     call.on('data', function (response: LocationUpdateResponse) {
-      currentUser = user.profile.sub
+      currentUserId = currentUser.profile.sub
 
-      response.getLocationupdatesList().forEach((locationUpdate) => {
-        const current = characters.find(
-          (c) => c.characterId === locationUpdate.getCharacterid()
-        )
-        if (!locationUpdate.getOnline()) {
-          characters = characters.filter((c) => c !== current)
-        } else {
-          if (current) {
-            current.x = locationUpdate.getX()
-            current.y = locationUpdate.getY()
-          } else {
-            characters = [
-              ...characters,
-              {
-                characterId: locationUpdate.getCharacterid(),
-                x: locationUpdate.getX(),
-                y: locationUpdate.getY(),
-              },
-            ]
-          }
-        }
-      })
+      response.getLocationupdatesList().forEach(handleLocationUpdate)
 
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
       redraw(context, latestProps)
     })
-  }, [user])
+  }, [currentUser])
 
   return <canvas ref={canvasRef} className={props.className} />
 }
