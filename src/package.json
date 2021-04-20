@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "test": "jest",
-    "test-all": "yarn lint && yarn type-check && yarn test"
+    "test-all": "yarn lint && yarn type-check && yarn test",
+    "generate-grpc-client": "protoc --proto_path=../../api/src/CharacterApi/Protos --js_out=import_style=commonjs,binary:grpc --grpc-web_out=import_style=typescript,mode=grpcwebtext:grpc location.proto"
   },
   "husky": {
     "hooks": {
