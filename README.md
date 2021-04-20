@@ -25,5 +25,9 @@ In this repository, you'll find all the source code of the online game Hello Moo
 
 Also, subscribe to our [YouTube channel](https://www.youtube.com/channel/UCLmFLctb6jsUP-YIc3yhfCw/) to keep updated about the latest development!
 
+Feature requests:
+[![Feature Requests](https://feathub.com/HelloMoonGame/game?format=svg)](https://feathub.com/HelloMoonGame/game)
+Please add your own ideas or vote on existing ones at [FeatHub](https://feathub.com/HelloMoonGame/game).
+
 ## Deployment
 To run the game in production, Kubernetes will be used. Since there is no code yet, it cannot be deployed at the moment. 
