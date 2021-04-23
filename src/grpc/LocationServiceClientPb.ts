@@ -1,5 +1,5 @@
 /**
- * @fileoverview gRPC-Web generated client stub for characterApi
+ * @fileoverview gRPC-Web generated client stub for
  * @enhanceable
  * @public
  */
@@ -44,7 +44,7 @@ export class LocationClient {
 
   subscribe(request: location_pb.Empty, metadata?: grpcWeb.Metadata) {
     return this.client_.serverStreaming(
-      this.hostname_ + '/characterApi.Location/Subscribe',
+      this.hostname_ + '/Location/Subscribe',
       request,
       metadata || {},
       this.methodInfoSubscribe
