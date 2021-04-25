@@ -59,7 +59,7 @@ const schema = yup.object().shape({
     .trim()
     .max(64)
     .matches(
-      /^[\u00C0-\u017Fa-zA-Z ]+$/,
+      /^[\u00C0-\u017Fa-zA-Z- ]+$/,
       'Only letters, spaces and - is allowed'
     ),
   sex: yup.string().required().oneOf(['Male', 'Female']),
