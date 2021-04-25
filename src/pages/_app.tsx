@@ -1,6 +1,7 @@
 import React from 'react'
 import { AppProps } from 'next/app'
 import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core'
+import Layout from '../components/Layout'
 import '../styles/game.css'
 
 const theme = createMuiTheme({
@@ -11,12 +12,18 @@ const theme = createMuiTheme({
   },
 })
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps, router }: AppProps) {
   return (
     <React.Fragment>
       <CssBaseline />
       <ThemeProvider theme={theme}>
-        <Component {...pageProps} />
+        {router.pathname.startsWith('/auth/') ? (
+          <Component {...pageProps} />
+        ) : (
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        )}
       </ThemeProvider>
     </React.Fragment>
   )
