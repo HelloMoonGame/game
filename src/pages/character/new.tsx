@@ -17,9 +17,18 @@ import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import axios from 'axios'
-import AuthService from '../../services/AuthService'
 import { useRouter } from 'next/router'
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, AppState } from '../../state/store'
+import {
+  characterSelectors,
+  characterOperations,
+} from '../../state/ducks/character'
+import {
+  ApiError,
+  CreateCharacterRequest,
+} from '../../state/ducks/character/models'
+import { unwrapResult } from '@reduxjs/toolkit'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -49,54 +58,47 @@ const useStyles = makeStyles((theme) => ({
 const schema = yup.object().shape({
   firstName: yup
     .string()
-    .required()
+    .required('Required')
     .trim()
-    .max(32)
+    .max(32, 'Max. 32 characters')
     .matches(/^[\u00C0-\u017Fa-zA-Z-]+$/, 'Only letters and - is allowed'),
   lastName: yup
     .string()
-    .required()
+    .required('Required')
     .trim()
-    .max(64)
+    .max(64, 'Max. 64 characters')
     .matches(
       /^[\u00C0-\u017Fa-zA-Z- ]+$/,
       'Only letters, spaces and - is allowed'
     ),
-  sex: yup.string().required().oneOf(['Male', 'Female']),
+  sex: yup.string().required('Required').oneOf(['Male', 'Female']),
 })
 
 export const Home = (): JSX.Element => {
   const router = useRouter()
   const classes = useStyles()
+  const dispatch = useDispatch<AppDispatch>()
+  const useAppSelector: TypedUseSelectorHook<AppState> = useSelector
+  const myCharacter = useAppSelector(characterSelectors.getMyCharacter)
+
+  if (myCharacter != null) router.push('/')
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<CreateCharacterRequest>({
     resolver: yupResolver(schema),
     mode: 'onChange',
   })
   const [error, setError] = useState('')
 
-  const onSubmit = (data: any) => {
-    const authService = AuthService.getInstance()
-    authService.getUserOrLogin().then((user) => {
-      axios
-        .post(`${process.env.NEXT_PUBLIC_CHARACTERAPI_URL}/mycharacter`, data, {
-          headers: {
-            Authorization: `Bearer ${user.access_token}`,
-          },
-        })
-        .then((_) => {
-          router.push('/')
-        })
-        .catch((e) => {
-          // Error 409 Conflict means the user already has a character
-          if (e.response.status == 409) router.push('/')
-
-          if (e.message) setError(`${e.message}: ${e.response.statusText}`)
-        })
-    })
+  const onSubmit = (data: CreateCharacterRequest) => {
+    dispatch(characterOperations.createMyCharacterAsync(data))
+      .then(unwrapResult)
+      .catch((rejectedValueOrSerializedError: ApiError<any>) => {
+        setError(rejectedValueOrSerializedError.errorMessage)
+      })
   }
 
   return (
@@ -125,6 +127,7 @@ export const Home = (): JSX.Element => {
                 label="First Name"
                 autoFocus
                 error={!!errors.firstName}
+                helperText={errors.firstName?.message}
                 {...register('firstName')}
               />
             </Grid>
@@ -138,9 +141,9 @@ export const Home = (): JSX.Element => {
                 id="lastName"
                 label="Last Name"
                 error={!!errors.lastName}
+                helperText={errors.lastName?.message}
                 {...register('lastName')}
               />
-              <FormHelperText>{errors.lastName?.message}</FormHelperText>
             </Grid>
             <Grid item xs={12}>
               <FormControl
