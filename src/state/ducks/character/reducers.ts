@@ -22,15 +22,15 @@ export const counterSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchMyCharacterAsync.fulfilled, (state, action) => {
       state.myCharacter = action.payload
-    }),
-      builder.addCase(createMyCharacterAsync.fulfilled, (state, action) => {
-        state.myCharacter = action.payload
-      }),
-      builder.addCase(createMyCharacterAsync.rejected, (state, action) => {
-        if (action.payload.data && action.payload.errorCode == 409) {
-          state.myCharacter = action.payload.data
-        }
-      })
+    })
+    builder.addCase(createMyCharacterAsync.fulfilled, (state, action) => {
+      state.myCharacter = action.payload
+    })
+    builder.addCase(createMyCharacterAsync.rejected, (state, action) => {
+      if (action.payload.data && action.payload.errorCode == 409) {
+        state.myCharacter = action.payload.data
+      }
+    })
   },
 })
 

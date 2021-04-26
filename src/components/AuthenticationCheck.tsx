@@ -20,7 +20,7 @@ const AuthenticationCheck = ({ children }) => {
     if (!router.pathname.startsWith('/auth/')) {
       const authService = AuthService.getInstance()
       if (user == null)
-        authService.getUserOrLogin().then((user) => setUser(user))
+        authService.getUserOrLogin().then((newUser) => setUser(newUser))
     }
   }, [user])
 

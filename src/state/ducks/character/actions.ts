@@ -12,8 +12,7 @@ export const fetchMyCharacterAsync = createAsyncThunk<
   }
 >(types.FETCH_MYCHARACTER, async (_, { rejectWithValue }) => {
   try {
-    const response = await fetchMyCharacter()
-    return response
+    return await fetchMyCharacter()
   } catch (e) {
     return rejectWithValue(e.message)
   }
@@ -27,8 +26,7 @@ export const createMyCharacterAsync = createAsyncThunk<
   }
 >(types.CREATE_MYCHARACTER, async (character, { rejectWithValue }) => {
   try {
-    const response = await createMyCharacter(character)
-    return response
+    return await createMyCharacter(character)
   } catch (e) {
     return rejectWithValue({
       errorMessage: `${e.message} (${e.response.statusText})`,
