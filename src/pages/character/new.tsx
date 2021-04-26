@@ -18,8 +18,6 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { useRouter } from 'next/router'
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, AppState } from '../../state/store'
 import {
   characterSelectors,
   characterOperations,
@@ -29,6 +27,7 @@ import {
   CreateCharacterRequest,
 } from '../../state/ducks/character/models'
 import { unwrapResult } from '@reduxjs/toolkit'
+import { useAppSelector, useAppDispatch } from '../../state/hooks'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -77,9 +76,8 @@ const schema = yup.object().shape({
 export const Home = (): JSX.Element => {
   const router = useRouter()
   const classes = useStyles()
-  const dispatch = useDispatch<AppDispatch>()
-  const useAppSelector: TypedUseSelectorHook<AppState> = useSelector
   const myCharacter = useAppSelector(characterSelectors.getMyCharacter)
+  const dispatch = useAppDispatch()
 
   if (myCharacter != null) router.push('/')
 
