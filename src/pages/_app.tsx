@@ -3,6 +3,9 @@ import { AppProps } from 'next/app'
 import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core'
 import Layout from '../components/Layout'
 import '../styles/game.css'
+import { Provider } from 'react-redux'
+
+import store from '../state/store'
 
 const theme = createMuiTheme({
   palette: {
@@ -14,7 +17,7 @@ const theme = createMuiTheme({
 
 export default function MyApp({ Component, pageProps, router }: AppProps) {
   return (
-    <React.Fragment>
+    <Provider store={store}>
       <CssBaseline />
       <ThemeProvider theme={theme}>
         {router.pathname.startsWith('/auth/') ? (
@@ -25,6 +28,6 @@ export default function MyApp({ Component, pageProps, router }: AppProps) {
           </Layout>
         )}
       </ThemeProvider>
-    </React.Fragment>
+    </Provider>
   )
 }
