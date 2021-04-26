@@ -44,7 +44,7 @@ export default class AuthService {
 
   public getUserOrLogin(): Promise<User | null> {
     return this.getUser().then((user) => {
-      if (user && user.access_token) {
+      if (user && user.access_token && !user.expired) {
         return user
       } else if (user) {
         return this.renewToken().then((renewedUser) => renewedUser)
