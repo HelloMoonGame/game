@@ -6,6 +6,7 @@ import '../styles/game.css'
 import { Provider } from 'react-redux'
 
 import store from '../state/store'
+import AuthenticationCheck from '../components/AuthenticationCheck'
 
 const theme = createMuiTheme({
   palette: {
@@ -15,19 +16,17 @@ const theme = createMuiTheme({
   },
 })
 
-export default function MyApp({ Component, pageProps, router }: AppProps) {
+export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Provider store={store}>
       <CssBaseline />
-      <ThemeProvider theme={theme}>
-        {router.pathname.startsWith('/auth/') ? (
-          <Component {...pageProps} />
-        ) : (
+      <AuthenticationCheck>
+        <ThemeProvider theme={theme}>
           <Layout>
             <Component {...pageProps} />
           </Layout>
-        )}
-      </ThemeProvider>
+        </ThemeProvider>
+      </AuthenticationCheck>
     </Provider>
   )
 }
