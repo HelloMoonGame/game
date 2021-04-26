@@ -1,7 +1,11 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 
+import * as reducers from './ducks'
+
 export function makeStore() {
-  return configureStore({})
+  return configureStore({
+    reducer: reducers,
+  })
 }
 
 const store = makeStore()
