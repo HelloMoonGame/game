@@ -62,14 +62,12 @@ const Layout = ({ children, title }: Props) => {
   const [currentUser, setCurrentUser] = useState<User>()
   useEffect(() => {
     const authService = AuthService.getInstance()
-    authService.getUserOrLogin().then((user) => setCurrentUser(user))
+    authService.getUser().then((user) => setCurrentUser(user))
   }, [])
 
   const signOut = () => {
     AuthService.getInstance().logout()
   }
-
-  if (!currentUser) return <></>
 
   return (
     <>
@@ -94,37 +92,39 @@ const Layout = ({ children, title }: Props) => {
             <Typography variant="h6" className={classes.title}>
               Hello Moon
             </Typography>
-            <div>
-              <IconButton
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleMenu}
-                color="inherit"
-              >
-                <Icon>account_circle</Icon>
-                <Typography variant="body1" className={classes.username}>
-                  {currentUser.profile.name}
-                </Typography>
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={open}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={signOut}>Logout</MenuItem>
-              </Menu>
-            </div>
+            {currentUser && (
+              <div>
+                <IconButton
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleMenu}
+                  color="inherit"
+                >
+                  <Icon>account_circle</Icon>
+                  <Typography variant="body1" className={classes.username}>
+                    {currentUser.profile.name}
+                  </Typography>
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={open}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={signOut}>Logout</MenuItem>
+                </Menu>
+              </div>
+            )}
           </Toolbar>
         </AppBar>
       </header>
