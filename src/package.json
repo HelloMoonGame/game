@@ -13,13 +13,8 @@
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "test": "jest",
     "test-all": "yarn lint && yarn type-check && yarn test",
-    "generate-grpc-client": "protoc --proto_path=../../api/src/CharacterApi/Protos --js_out=import_style=commonjs,binary:grpc --grpc-web_out=import_style=typescript,mode=grpcwebtext:grpc location.proto"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "yarn run type-check"
-    }
+    "generate-grpc-client": "protoc --proto_path=../../api/src/CharacterApi/Protos --js_out=import_style=commonjs,binary:grpc --grpc-web_out=import_style=typescript,mode=grpcwebtext:grpc location.proto",
+    "prepare": "cd .. && husky install src/.husky"
   },
   "lint-staged": {
     "*.@(ts|tsx)": [
@@ -40,27 +35,28 @@
     "oidc-client": "^1.11.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-hook-form": "^7.3.3",
+    "react-hook-form": "^7.3.4",
     "react-redux": "^7.2.4",
     "xmlhttprequest": "^1.8.0",
     "yup": "^0.32.9"
   },
   "devDependencies": {
-    "@testing-library/react": "^10.0.1",
-    "@types/jest": "^25.1.4",
-    "@types/node": "^13.9.5",
-    "@types/react": "^16.9.27",
+    "@testing-library/react": "^11.2.6",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^15.0.0",
+    "@types/react": "^17.0.4",
     "@types/react-dom": "^17.0.3",
     "@types/react-redux": "^7.1.16",
-    "@typescript-eslint/eslint-plugin": "^2.25.0",
-    "@typescript-eslint/parser": "^2.25.0",
-    "babel-jest": "^25.2.3",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.1",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "babel-jest": "^26.6.3",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.19.0",
-    "husky": "^4.2.3",
+    "husky": "^6.0.0",
     "jest": "^26.6.3",
-    "jest-watch-typeahead": "^0.5.0",
+    "jest-watch-typeahead": "^0.6.3",
     "lint-staged": "^10.0.10",
     "prettier": "^2.0.2",
     "typescript": "^4.2.4"
