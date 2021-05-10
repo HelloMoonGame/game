@@ -1,1 +1,13 @@
-{}
+{
+  "appId": "nl.hellomoon.game",
+  "appName": "Hello Moon",
+  "bundledWebRuntime": false,
+  "npmClient": "yarn",
+  "webDir": "out",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {}
+}
