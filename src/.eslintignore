@@ -2,3 +2,6 @@
 **/out/*
 **/.next/*
 grpc/*
+**/android/*
+**/ios/*
+**/electron/*
