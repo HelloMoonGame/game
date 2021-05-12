@@ -103,26 +103,6 @@ const redraw = (
         }
       }
     }
-
-    // const centerX = props.canvasWidth / 2,
-    //   centerY = props.canvasHeight / 2,
-    //   lotSize = Math.min(props.lotWidth, props.lotHeight)
-
-    // characters.forEach((c) => {
-    //   const offsetX = (c.x - props.centerLotX) * props.lotWidth
-    //   let offsetY = (c.y - props.centerLotY) * props.lotHeight
-
-    //   if (c.y % 2 === 0) offsetY -= props.lotHeight * 0.35
-    //   else offsetY += props.lotHeight * 0.35
-
-    //   const x = centerX + offsetX,
-    //     y = centerY + offsetY
-
-    //   ctx.fillStyle = currentCharacterId === c.characterId ? '#0F0' : '#000'
-    //   ctx.beginPath()
-    //   ctx.arc(x, y, lotSize * 0.05, 0, 2 * Math.PI)
-    //   ctx.fill()
-    // })
   }
 }
 
