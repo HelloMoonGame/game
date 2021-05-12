@@ -1,6 +1,9 @@
 import React from 'react'
 import { act, render } from '../testUtils'
 import { Home } from '../../pages/index'
+import { createStore } from 'redux'
+import { Provider } from 'react-redux'
+import reducer from '../../state/ducks/character'
 
 jest.mock(
   '../../services/AuthService',
@@ -38,8 +41,14 @@ jest.mock(
 describe('Home page', () => {
   it('matches snapshot', async () => {
     let asFragment
+    const store = createStore(reducer, null)
     await act(() => {
-      asFragment = render(<Home />, {}).asFragment
+      asFragment = render(
+        <Provider store={store}>
+          <Home />
+        </Provider>,
+        {}
+      ).asFragment
     })
     expect(asFragment()).toMatchSnapshot()
   })

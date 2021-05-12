@@ -10,41 +10,106 @@ import {
   LocationUpdateResponse,
 } from '../../grpc/location_pb'
 import { StatusCode } from 'grpc-web'
+import { useAppSelector } from '../../state/hooks'
+import { characterSelectors } from '../../state/ducks/character'
 
 let characters = []
 let latestProps: LayerProps
-let currentUserId: string
 
-const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
+const amountOfLots = (canvasLength: number, lotLength: number) =>
+  Math.ceil(canvasLength / lotLength) % 2 == 0
+    ? Math.ceil(canvasLength / lotLength) + 1
+    : Math.ceil(canvasLength / lotLength)
+
+const startPosition = (canvasLength: number, lotLength: number) =>
+  (canvasLength - amountOfLots(canvasLength, lotLength) * lotLength) / 2
+
+const redraw = (
+  ctx: CanvasRenderingContext2D,
+  props: LayerProps,
+  currentCharacterId: string
+) => {
   if (ctx) {
+    const amountOfLotsX = amountOfLots(props.canvasWidth, props.lotWidth),
+      amountOfLotsY = amountOfLots(props.canvasHeight, props.lotHeight),
+      startX = startPosition(props.canvasWidth, props.lotWidth),
+      startY = startPosition(props.canvasHeight, props.lotHeight),
+      centerLotX = 0,
+      centerLotY = 0,
+      lastLotX = centerLotX + amountOfLotsX / 2 - 0.5,
+      lastLotY = centerLotY + amountOfLotsY / 2 - 0.5,
+      lotSize = Math.min(props.lotWidth, props.lotHeight)
+
     latestProps = props
     ctx.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
 
-    const centerX = props.canvasWidth / 2,
-      centerY = props.canvasHeight / 2,
-      lotSize = Math.min(props.lotWidth, props.lotHeight)
+    if (characters.length < 10) {
+      for (let i = 0; i < 5; i++)
+        characters[characters.length] = {
+          x: 0,
+          y: 1,
+        }
 
-    characters.forEach((c) => {
-      const offsetX = (c.x - props.centerLotX) * props.lotWidth
-      let offsetY = (c.y - props.centerLotY) * props.lotHeight
+      for (let i = 0; i < 233; i++)
+        characters[characters.length] = {
+          x: 1,
+          y: 1,
+        }
+    }
+    for (let lotY = lastLotY - amountOfLotsY + 1; lotY <= lastLotY; lotY++) {
+      for (let lotX = lastLotX - amountOfLotsX + 1; lotX <= lastLotX; lotX++) {
+        const x =
+          startX + (lotX - lastLotX + amountOfLotsX - 1) * props.lotWidth
+        const y =
+          startY + (lotY - lastLotY + amountOfLotsY - 1) * props.lotHeight
 
-      if (c.y % 2 === 0) offsetY -= props.lotHeight * 0.35
-      else offsetY += props.lotHeight * 0.35
+        const charactersOnLot = characters
+          .filter((c) => c.x == lotX && c.y == lotY)
+          .sort((a, _) => (a.characterId == currentCharacterId ? 1 : -1))
 
-      const x = centerX + offsetX,
-        y = centerY + offsetY
+        const charactersOnLotToShow = charactersOnLot.slice(-15)
 
-      ctx.fillStyle = currentUserId === c.characterId ? '#0F0' : '#000'
-      ctx.beginPath()
-      ctx.arc(x, y, lotSize * 0.05, 0, 2 * Math.PI)
-      ctx.fill()
-    })
+        const offsetY = lotSize * (lotY % 2 === 0 ? 0.15 : 0.85)
+
+        charactersOnLotToShow.forEach((character, index) => {
+          const characterOffset =
+            (charactersOnLotToShow.length - index + 1) * (lotSize * 0.05)
+          const offsetX =
+            lotX % 2 === 0
+              ? lotSize * 0.15 + characterOffset
+              : lotSize * 0.85 - characterOffset
+
+          ctx.fillStyle =
+            currentCharacterId === character.characterId ? '#0F0' : '#000'
+          ctx.beginPath()
+          ctx.arc(x + offsetX, y + offsetY, lotSize * 0.05, 0, 2 * Math.PI)
+          ctx.fill()
+        })
+
+        const charactersNotVisible =
+          charactersOnLot.length - charactersOnLotToShow.length
+        if (charactersNotVisible > 0) {
+          const offsetXForText =
+            lotX % 2 === 0 ? lotSize * 0.95 : lotSize * 0.05
+          ctx.fillStyle = '#FFF'
+          ctx.font = lotSize * 0.075 + 'px Arial'
+          ctx.textAlign = lotX % 2 === 0 ? 'right' : 'left'
+          ctx.fillText(
+            `+${charactersNotVisible}`,
+            x + offsetXForText,
+            y + offsetY + lotSize * 0.025,
+            lotSize
+          )
+        }
+      }
+    }
   }
 }
 
-const CharacterLayer = (props: LayerProps) => {
+const CharacterLayer = (props: LayerProps): JSX.Element => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [currentUser, setCurrentUser] = useState<User>()
+  const myCharacter = useAppSelector(characterSelectors.getMyCharacter)
 
   useEffect(() => {
     const authService = AuthService.getInstance()
@@ -56,14 +121,14 @@ const CharacterLayer = (props: LayerProps) => {
     const context = canvas.getContext('2d')
     canvas.width = props.canvasWidth
     canvas.height = props.canvasHeight
-    redraw(context, props)
+    redraw(context, props, myCharacter?.id)
   }, [props.canvasWidth, props.canvasHeight])
 
   useEffect(() => {
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
-    redraw(context, props)
-  }, [props.lotWidth, props.lotHeight])
+    redraw(context, props, myCharacter?.id)
+  }, [props.lotWidth, props.lotHeight, myCharacter])
 
   function reAuthenticate() {
     const authService = AuthService.getInstance()
@@ -122,13 +187,11 @@ const CharacterLayer = (props: LayerProps) => {
       }
     })
     call.on('data', function (response: LocationUpdateResponse) {
-      currentUserId = currentUser.profile.sub
-
       response.getLocationupdatesList().forEach(handleLocationUpdate)
 
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
-      redraw(context, latestProps)
+      redraw(context, latestProps, myCharacter.id)
     })
   }, [currentUser])
 
