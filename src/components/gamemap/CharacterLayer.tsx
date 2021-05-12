@@ -43,19 +43,6 @@ const redraw = (
     latestProps = props
     ctx.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
 
-    if (characters.length < 10) {
-      for (let i = 0; i < 5; i++)
-        characters[characters.length] = {
-          x: 0,
-          y: 1,
-        }
-
-      for (let i = 0; i < 233; i++)
-        characters[characters.length] = {
-          x: 1,
-          y: 1,
-        }
-    }
     for (let lotY = lastLotY - amountOfLotsY + 1; lotY <= lastLotY; lotY++) {
       for (let lotX = lastLotX - amountOfLotsX + 1; lotX <= lastLotX; lotX++) {
         const x =
