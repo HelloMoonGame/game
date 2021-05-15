@@ -17,7 +17,7 @@ export default class AuthService {
       silent_redirect_uri: `${process.env.NEXT_PUBLIC_URL}/auth/renew-callback`,
       post_logout_redirect_uri: process.env.NEXT_PUBLIC_URL,
       response_type: 'code',
-      scope: 'openid profile characterapi',
+      scope: 'openid email characterapi',
       client_secret: process.env.NEXT_PUBLIC_AUTH_CLIENT_SECRET,
     }
     this.userManager = new UserManager(settings)

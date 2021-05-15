@@ -103,7 +103,7 @@ const Layout = ({ children, title }: Props) => {
                 >
                   <Icon>account_circle</Icon>
                   <Typography variant="body1" className={classes.username}>
-                    {currentUser.profile.name}
+                    {currentUser.profile.email}
                   </Typography>
                 </IconButton>
                 <Menu
