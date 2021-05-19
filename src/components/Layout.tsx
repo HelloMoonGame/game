@@ -24,12 +24,10 @@ const useStyles = makeStyles((theme) => ({
   pageMain: {
     position: 'relative',
     width: '100%',
-    minHeight: 'calc(100vh - 56px - 56px);',
-    top: 56,
+    marginTop: 56,
     marginBottom: 56,
     [theme.breakpoints.up('sm')]: {
-      top: 64,
-      minHeight: 'calc(100vh - 56px - 64px);',
+      marginTop: 64,
     },
   },
   title: {
