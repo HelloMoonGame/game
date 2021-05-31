@@ -18,7 +18,120 @@ const amountOfLots = (canvasLength: number, lotLength: number) =>
     : Math.ceil(canvasLength / lotLength)
 
 const startPosition = (canvasLength: number, lotLength: number) =>
-  (canvasLength - amountOfLots(canvasLength, lotLength) * lotLength) / 2
+  Math.floor(
+    (canvasLength - amountOfLots(canvasLength, lotLength) * lotLength) / 2
+  )
+
+const hasRiverTop = (lot: LotDetails) => (lot.lotY + 5) % 12 == 0
+const hasRiverBottom = (lot: LotDetails) => (lot.lotY + 6) % 12 == 0
+const hasRiverLeft = (lot: LotDetails) => (lot.lotX + 5) % 12 == 0
+const hasRiverRight = (lot: LotDetails) => (lot.lotX + 6) % 12 == 0
+const hasRiver = (lot: LotDetails) =>
+  hasRiverRight(lot) ||
+  hasRiverLeft(lot) ||
+  hasRiverTop(lot) ||
+  hasRiverBottom(lot)
+
+const drawWater = (ctx: CanvasRenderingContext2D, lot: LotDetails) => {
+  ctx.fillStyle = '#425f91'
+
+  if (hasRiverRight(lot)) {
+    ctx.fillRect(lot.x + lot.width, lot.y, lot.width / -2, lot.height)
+  }
+
+  if (hasRiverLeft(lot)) {
+    ctx.fillRect(lot.x, lot.y, lot.width / 2, lot.height)
+  }
+
+  if (hasRiverBottom(lot)) {
+    ctx.fillRect(lot.x, lot.y + lot.height, lot.width, lot.height / -2)
+  }
+
+  if (hasRiverTop(lot)) {
+    ctx.fillRect(lot.x, lot.y, lot.width, lot.height / 2)
+  }
+}
+
+const hasParkBottomRight = (lot: LotDetails) =>
+  lot.lotX % 12 == 0 && lot.lotY % 12 == 0
+const hasParkBottomLeft = (lot: LotDetails) =>
+  (lot.lotX - 1) % 12 == 0 && lot.lotY % 12 == 0
+const hasParkTopRight = (lot: LotDetails) =>
+  lot.lotX % 12 == 0 && (lot.lotY - 1) % 12 == 0
+const hasParkTopLeft = (lot: LotDetails) =>
+  (lot.lotX - 1) % 12 == 0 && (lot.lotY - 1) % 12 == 0
+const hasPark = (lot: LotDetails) =>
+  hasParkBottomLeft(lot) ||
+  hasParkBottomRight(lot) ||
+  hasParkTopLeft(lot) ||
+  hasParkTopRight(lot)
+
+const drawPark = (ctx: CanvasRenderingContext2D, lot: LotDetails) => {
+  ctx.fillStyle = '#33691e'
+  if (hasPark(lot)) {
+    ctx.fillRect(lot.x, lot.y, lot.width, lot.height)
+  }
+
+  if (hasParkTopLeft(lot)) {
+    ctx.beginPath()
+    ctx.fillStyle = '#6b3a2b'
+    ctx.fillRect(
+      lot.x - lot.width + halfRoadSize(lot),
+      lot.y - lot.height * 0.075,
+      (lot.width - halfRoadSize(lot)) * 2,
+      lot.height * 0.15
+    )
+    ctx.fillRect(
+      lot.x - lot.width * 0.075,
+      lot.y - lot.height + halfRoadSize(lot),
+      lot.width * 0.15,
+      (lot.height - halfRoadSize(lot)) * 2
+    )
+    ctx.arc(lot.x, lot.y, lot.width / 2.5, 0, 2 * Math.PI, false)
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.fillStyle = '#7b7b7b'
+    ctx.arc(lot.x, lot.y, lot.width / 3.5, 0, 2 * Math.PI, false)
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.fillStyle = '#9d9d9d'
+    ctx.arc(
+      lot.x - lot.width * 0.01,
+      lot.y - lot.width * 0.01,
+      lot.width / 3.5,
+      0,
+      2 * Math.PI,
+      false
+    )
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.fillStyle = '#7b7b7b'
+    ctx.arc(
+      lot.x - lot.width * 0.01,
+      lot.y - lot.width * 0.01,
+      lot.width / 3.8,
+      0,
+      2 * Math.PI,
+      false
+    )
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.fillStyle = '#425f91'
+    ctx.arc(
+      lot.x - lot.width * 0.008,
+      lot.y - lot.width * 0.008,
+      lot.width / 3.9,
+      0,
+      2 * Math.PI,
+      false
+    )
+    ctx.fill()
+  }
+}
 
 const roadOnTop = (lot: LotDetails) => lot.lotY % 2 === 0
 const roadOnBottom = (lot: LotDetails) => lot.lotY % 2 !== 0
@@ -155,7 +268,6 @@ const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
         const x =
             startX + (lotX - lastLotX + amountOfLotsX - 1) * props.lotWidth,
           y = startY + (lotY - lastLotY + amountOfLotsY - 1) * props.lotHeight
-
         const lotDetails: LotDetails = {
           lotX,
           lotY,
@@ -164,26 +276,30 @@ const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
           width: props.lotWidth,
           height: props.lotHeight,
         }
+        drawWater(ctx, lotDetails)
+        drawPark(ctx, lotDetails)
         drawRoadBase(ctx, lotDetails)
         drawRoadCorner(ctx, lotDetails)
         drawRoadLines(ctx, lotDetails)
 
-        ctx.fillStyle = '#ff0000'
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.font = '40px Arial'
-        ctx.fillText(
-          `${lotX},${lotY}`,
-          lotDetails.x + lotDetails.width / 2,
-          lotDetails.y + lotDetails.height / 2,
-          80
-        )
+        if (!hasRiver(lotDetails) && !hasPark(lotDetails)) {
+          ctx.fillStyle = '#ff0000'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.font = props.lotHeight / 5 + 'px Arial'
+          ctx.fillText(
+            `${lotX},${lotY}`,
+            lotDetails.x + lotDetails.width / 2,
+            lotDetails.y + lotDetails.height / 2,
+            props.lotWidth
+          )
+        }
       }
     }
   }
 }
 
-const InfrastructureLayer = (props: LayerProps) => {
+const InfrastructureLayer = (props: LayerProps): JSX.Element => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {

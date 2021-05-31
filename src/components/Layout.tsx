@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const Layout = ({ children, title }: Props) => {
+const Layout = ({ children, title }: Props): JSX.Element => {
   const classes = useStyles()
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)

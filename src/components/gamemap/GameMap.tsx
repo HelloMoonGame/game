@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
   },
 }))
 
-const GameMap = () => {
+const GameMap = (): JSX.Element => {
   const classes = useStyles(),
     divRef = useRef<HTMLDivElement>(null)
 
