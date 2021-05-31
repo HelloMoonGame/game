@@ -13,7 +13,7 @@ const BackgroundLayer = ({
   className,
   canvasWidth,
   canvasHeight,
-}: LayerProps) => {
+}: LayerProps): JSX.Element => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {

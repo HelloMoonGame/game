@@ -9,7 +9,7 @@ import {
 } from '../state/ducks/character'
 import { useAppSelector, useAppDispatch } from '../state/hooks'
 
-const AuthenticationCheck = ({ children }) => {
+const AuthenticationCheck = ({ children }): JSX.Element => {
   const router = useRouter()
   const [user, setUser] = useState<User>()
   const myCharacter = useAppSelector(characterSelectors.getMyCharacter)

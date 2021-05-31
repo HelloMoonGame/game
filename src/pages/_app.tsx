@@ -16,7 +16,7 @@ const theme = createMuiTheme({
   },
 })
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <Provider store={store}>
       <CssBaseline />
