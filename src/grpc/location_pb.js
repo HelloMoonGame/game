@@ -310,11 +310,9 @@ proto.LocationUpdateResponse.serializeBinaryToWriter = function (
  * @return {!Array<!proto.LocationUpdate>}
  */
 proto.LocationUpdateResponse.prototype.getLocationupdatesList = function () {
-  return /** @type{!Array<!proto.LocationUpdate>} */ (jspb.Message.getRepeatedWrapperField(
-    this,
-    proto.LocationUpdate,
-    1
-  ))
+  return /** @type{!Array<!proto.LocationUpdate>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.LocationUpdate, 1)
+  )
 }
 
 /**
@@ -502,11 +500,9 @@ proto.LocationUpdate.prototype.setCharacterid = function (value) {
  * @return {boolean}
  */
 proto.LocationUpdate.prototype.getOnline = function () {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(
-    this,
-    2,
-    false
-  ))
+  return /** @type {boolean} */ (
+    jspb.Message.getBooleanFieldWithDefault(this, 2, false)
+  )
 }
 
 /**
