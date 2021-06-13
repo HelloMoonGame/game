@@ -40,6 +40,17 @@ const useStyles = makeStyles((theme) => ({
     position: 'fixed',
     bottom: 0,
     width: '100%',
+    boxShadow:
+      'rgb(0 0 0 / 20%) 0px -2px 1px -1px, rgb(0 0 0 / 14%) 0px -1px 1px 0px, rgb(0 0 0 / 12%) 0px -1px 3px 0px',
+  },
+  bottomNavigation: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  bottomNavigationAction: {
+    color: theme.palette.primary.light,
+    '&.Mui-selected, :hover': {
+      color: theme.palette.primary.contrastText,
+    },
   },
 }))
 
@@ -134,10 +145,14 @@ const Layout = ({ children, title }: Props): JSX.Element => {
           //   setValue(newValue);
           // }}
           showLabels
+          className={classes.bottomNavigation}
+          value="explore"
         >
           <BottomNavigationAction
             label="Explore"
+            value="explore"
             icon={<Icon>location_on</Icon>}
+            className={classes.bottomNavigationAction}
           />
         </BottomNavigation>
       </footer>

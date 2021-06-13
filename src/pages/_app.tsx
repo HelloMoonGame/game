@@ -11,7 +11,10 @@ import AuthenticationCheck from '../components/AuthenticationCheck'
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#212529',
+      main: '#0b3663',
+    },
+    secondary: {
+      main: '#fdd300',
     },
   },
 })
