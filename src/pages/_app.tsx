@@ -2,7 +2,6 @@ import React from 'react'
 import { AppProps } from 'next/app'
 import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core'
 import Layout from '../components/Layout'
-import '../styles/game.css'
 import { Provider } from 'react-redux'
 
 import store from '../state/store'
