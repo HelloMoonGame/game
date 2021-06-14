@@ -32,6 +32,11 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    display: 'flex',
+    margin: 0,
+  },
+  titleImage: {
+    height: 40,
   },
   username: {
     marginLeft: 5,
@@ -98,9 +103,13 @@ const Layout = ({ children, title }: Props): JSX.Element => {
       <header>
         <AppBar position="fixed">
           <Toolbar>
-            <Typography variant="h6" className={classes.title}>
-              Hello Moon
-            </Typography>
+            <h1 className={classes.title}>
+              <img
+                src="/logo.svg"
+                alt="Hello Moon"
+                className={classes.titleImage}
+              />
+            </h1>
             {currentUser && (
               <div>
                 <IconButton
