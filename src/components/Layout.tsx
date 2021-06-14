@@ -125,6 +125,16 @@ const Layout = ({ children, title }: Props): JSX.Element => {
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
         />
       </Head>
+      <style jsx global>{`
+        html,
+        body {
+          height: 100%;
+        }
+        #__next {
+          display: flex;
+          height: 100%;
+        }
+      `}</style>
       <header>
         <AppBar position="fixed">
           <Toolbar>
