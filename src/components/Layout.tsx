@@ -14,6 +14,8 @@ import {
 } from '@material-ui/core'
 import AuthService from '../services/AuthService'
 import { User } from 'oidc-client'
+import { useAppSelector } from '../state/hooks'
+import { characterSelectors } from '../state/ducks/character'
 
 type Props = {
   children?: ReactNode
@@ -79,6 +81,8 @@ const Layout = ({ children, title }: Props): JSX.Element => {
     authService.getUser().then((user) => setCurrentUser(user))
   }, [])
 
+  const myCharacter = useAppSelector(characterSelectors.getMyCharacter)
+
   const signOut = () => {
     AuthService.getInstance().logout()
   }
@@ -142,7 +146,9 @@ const Layout = ({ children, title }: Props): JSX.Element => {
                 >
                   <Icon>account_circle</Icon>
                   <Typography variant="body1" className={classes.username}>
-                    {currentUser.profile.email}
+                    {myCharacter
+                      ? `${myCharacter.firstName} ${myCharacter.lastName}`
+                      : currentUser.profile.email}
                   </Typography>
                 </IconButton>
                 <Menu
