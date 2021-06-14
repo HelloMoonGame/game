@@ -9,7 +9,11 @@ import {
 } from '../state/ducks/character'
 import { useAppSelector, useAppDispatch } from '../state/hooks'
 
-const AuthenticationCheck = ({ children }): JSX.Element => {
+type Props = {
+  children?: JSX.Element
+}
+
+const AuthenticationCheck = ({ children }: Props): JSX.Element => {
   const router = useRouter()
   const [user, setUser] = useState<User>()
   const myCharacter = useAppSelector(characterSelectors.getMyCharacter)
@@ -29,7 +33,7 @@ const AuthenticationCheck = ({ children }): JSX.Element => {
 
   // Require character, except for 'new character' page
   if (myCharacter == null) {
-    dispatch(characterOperations.fetchMyCharacterAsync())
+    dispatch<any>(characterOperations.fetchMyCharacterAsync())
       .then(unwrapResult)
       .catch(() => {
         if (!router.pathname.startsWith('/character/new'))

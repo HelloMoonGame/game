@@ -1,8 +1,13 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
+import {
+  configureStore,
+  ThunkAction,
+  Action,
+  EnhancedStore,
+} from '@reduxjs/toolkit'
 
 import * as reducers from './ducks'
 
-export function makeStore() {
+export function makeStore(): EnhancedStore {
   return configureStore({
     reducer: reducers,
   })
