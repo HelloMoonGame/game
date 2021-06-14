@@ -14,6 +14,8 @@ import {
 } from '@material-ui/core'
 import AuthService from '../services/AuthService'
 import { User } from 'oidc-client'
+import { useAppSelector } from '../state/hooks'
+import { characterSelectors } from '../state/ducks/character'
 
 type Props = {
   children?: ReactNode
@@ -32,6 +34,11 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    display: 'flex',
+    margin: 0,
+  },
+  titleImage: {
+    height: 40,
   },
   username: {
     marginLeft: 5,
@@ -40,6 +47,17 @@ const useStyles = makeStyles((theme) => ({
     position: 'fixed',
     bottom: 0,
     width: '100%',
+    boxShadow:
+      'rgb(0 0 0 / 20%) 0px -2px 1px -1px, rgb(0 0 0 / 14%) 0px -1px 1px 0px, rgb(0 0 0 / 12%) 0px -1px 3px 0px',
+  },
+  bottomNavigation: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  bottomNavigationAction: {
+    color: theme.palette.primary.light,
+    '&.Mui-selected, :hover': {
+      color: theme.palette.primary.contrastText,
+    },
   },
 }))
 
@@ -63,6 +81,8 @@ const Layout = ({ children, title }: Props): JSX.Element => {
     authService.getUser().then((user) => setCurrentUser(user))
   }, [])
 
+  const myCharacter = useAppSelector(characterSelectors.getMyCharacter)
+
   const signOut = () => {
     AuthService.getInstance().logout()
   }
@@ -76,6 +96,27 @@ const Layout = ({ children, title }: Props): JSX.Element => {
           content="initial-scale=1.0, width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
         />
         <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0b3663" />
+        <meta name="msapplication-TileColor" content="#0b3663" />
+        <meta name="theme-color" content="#0b3663"></meta>
+        <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap"
         />
@@ -87,9 +128,13 @@ const Layout = ({ children, title }: Props): JSX.Element => {
       <header>
         <AppBar position="fixed">
           <Toolbar>
-            <Typography variant="h6" className={classes.title}>
-              Hello Moon
-            </Typography>
+            <h1 className={classes.title}>
+              <img
+                src="/logo.svg"
+                alt="Hello Moon"
+                className={classes.titleImage}
+              />
+            </h1>
             {currentUser && (
               <div>
                 <IconButton
@@ -101,7 +146,9 @@ const Layout = ({ children, title }: Props): JSX.Element => {
                 >
                   <Icon>account_circle</Icon>
                   <Typography variant="body1" className={classes.username}>
-                    {currentUser.profile.email}
+                    {myCharacter
+                      ? `${myCharacter.firstName} ${myCharacter.lastName}`
+                      : currentUser.profile.email}
                   </Typography>
                 </IconButton>
                 <Menu
@@ -134,10 +181,14 @@ const Layout = ({ children, title }: Props): JSX.Element => {
           //   setValue(newValue);
           // }}
           showLabels
+          className={classes.bottomNavigation}
+          value="explore"
         >
           <BottomNavigationAction
             label="Explore"
+            value="explore"
             icon={<Icon>location_on</Icon>}
+            className={classes.bottomNavigationAction}
           />
         </BottomNavigation>
       </footer>
