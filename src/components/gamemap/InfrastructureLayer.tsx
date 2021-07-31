@@ -241,53 +241,53 @@ const drawRoadLines = (ctx: CanvasRenderingContext2D, lot: LotDetails) => {
   }
 }
 
-const InfrastructureLayer = (props: LayerProps): JSX.Element => {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
+  if (ctx) {
+    ctx.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
 
-  const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
-    if (ctx) {
-      ctx.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
+    const calculator = new Calculator(props),
+      minLotX = calculator.getMinLotX(),
+      minLotY = calculator.getMinLotY(),
+      maxLotX = calculator.getMaxLotX(),
+      maxLotY = calculator.getMaxLotY()
 
-      const calculator = new Calculator(props),
-        minLotX = calculator.getMinLotX(),
-        minLotY = calculator.getMinLotY(),
-        maxLotX = calculator.getMaxLotX(),
-        maxLotY = calculator.getMaxLotY()
+    for (let lotY = minLotY; lotY <= maxLotY; lotY++) {
+      const y = calculator.getPositionYByLotY(lotY)
+      for (let lotX = minLotX; lotX <= maxLotX; lotX++) {
+        const x = calculator.getPositionXByLotX(lotX)
+        const lotDetails: LotDetails = {
+          lotX,
+          lotY,
+          x,
+          y,
+          width: props.lotWidth,
+          height: props.lotHeight,
+        }
+        drawWater(ctx, lotDetails)
+        drawPark(ctx, lotDetails)
+        drawRoadBase(ctx, lotDetails)
+        drawRoadCorner(ctx, lotDetails)
+        drawRoadLines(ctx, lotDetails)
 
-      for (let lotY = minLotY; lotY <= maxLotY; lotY++) {
-        const y = calculator.getPositionYByLotY(lotY)
-        for (let lotX = minLotX; lotX <= maxLotX; lotX++) {
-          const x = calculator.getPositionXByLotX(lotX)
-          const lotDetails: LotDetails = {
-            lotX,
-            lotY,
-            x,
-            y,
-            width: props.lotWidth,
-            height: props.lotHeight,
-          }
-          drawWater(ctx, lotDetails)
-          drawPark(ctx, lotDetails)
-          drawRoadBase(ctx, lotDetails)
-          drawRoadCorner(ctx, lotDetails)
-          drawRoadLines(ctx, lotDetails)
-
-          if (!hasRiver(lotDetails) && !hasPark(lotDetails)) {
-            ctx.fillStyle = '#ff0000'
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
-            ctx.font = props.lotHeight / 5 + 'px Arial'
-            ctx.fillText(
-              `${lotX},${lotY}`,
-              x + lotDetails.width / 2,
-              y + lotDetails.height / 2,
-              props.lotWidth
-            )
-          }
+        if (!hasRiver(lotDetails) && !hasPark(lotDetails)) {
+          ctx.fillStyle = '#ff0000'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.font = props.lotHeight / 5 + 'px Arial'
+          ctx.fillText(
+            `${lotX},${lotY}`,
+            x + lotDetails.width / 2,
+            y + lotDetails.height / 2,
+            props.lotWidth
+          )
         }
       }
     }
   }
+}
+
+const InfrastructureLayer = (props: LayerProps): JSX.Element => {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
