@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import Calculator from './Calculator'
 import { LayerProps } from './LayerProps'
 
 interface LotDetails {
@@ -11,16 +12,6 @@ interface LotDetails {
 }
 
 const halfRoadSize = (lot: LotDetails) => Math.min(lot.width, lot.height) * 0.15
-
-const amountOfLots = (canvasLength: number, lotLength: number) =>
-  Math.ceil(canvasLength / lotLength) % 2 == 0
-    ? Math.ceil(canvasLength / lotLength) + 1
-    : Math.ceil(canvasLength / lotLength)
-
-const startPosition = (canvasLength: number, lotLength: number) =>
-  Math.floor(
-    (canvasLength - amountOfLots(canvasLength, lotLength) * lotLength) / 2
-  )
 
 const hasRiverTop = (lot: LotDetails) => (lot.lotY + 5) % 12 == 0
 const hasRiverBottom = (lot: LotDetails) => (lot.lotY + 6) % 12 == 0
@@ -250,57 +241,53 @@ const drawRoadLines = (ctx: CanvasRenderingContext2D, lot: LotDetails) => {
   }
 }
 
-const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
-  const amountOfLotsX = amountOfLots(props.canvasWidth, props.lotWidth),
-    amountOfLotsY = amountOfLots(props.canvasHeight, props.lotHeight),
-    startX = startPosition(props.canvasWidth, props.lotWidth),
-    startY = startPosition(props.canvasHeight, props.lotHeight),
-    centerLotX = 0,
-    centerLotY = 0,
-    lastLotX = centerLotX + amountOfLotsX / 2 - 0.5,
-    lastLotY = centerLotY + amountOfLotsY / 2 - 0.5
+const InfrastructureLayer = (props: LayerProps): JSX.Element => {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  if (ctx) {
-    ctx.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
+  const redraw = (ctx: CanvasRenderingContext2D, props: LayerProps) => {
+    if (ctx) {
+      ctx.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
 
-    for (let lotY = lastLotY - amountOfLotsY + 1; lotY <= lastLotY; lotY++) {
-      for (let lotX = lastLotX - amountOfLotsX + 1; lotX <= lastLotX; lotX++) {
-        const x =
-            startX + (lotX - lastLotX + amountOfLotsX - 1) * props.lotWidth,
-          y = startY + (lotY - lastLotY + amountOfLotsY - 1) * props.lotHeight
-        const lotDetails: LotDetails = {
-          lotX,
-          lotY,
-          x,
-          y,
-          width: props.lotWidth,
-          height: props.lotHeight,
-        }
-        drawWater(ctx, lotDetails)
-        drawPark(ctx, lotDetails)
-        drawRoadBase(ctx, lotDetails)
-        drawRoadCorner(ctx, lotDetails)
-        drawRoadLines(ctx, lotDetails)
+      const calculator = new Calculator(props),
+        minLotX = calculator.getMinLotX(),
+        minLotY = calculator.getMinLotY(),
+        maxLotX = calculator.getMaxLotX(),
+        maxLotY = calculator.getMaxLotY()
 
-        if (!hasRiver(lotDetails) && !hasPark(lotDetails)) {
-          ctx.fillStyle = '#ff0000'
-          ctx.textAlign = 'center'
-          ctx.textBaseline = 'middle'
-          ctx.font = props.lotHeight / 5 + 'px Arial'
-          ctx.fillText(
-            `${lotX},${lotY}`,
-            lotDetails.x + lotDetails.width / 2,
-            lotDetails.y + lotDetails.height / 2,
-            props.lotWidth
-          )
+      for (let lotY = minLotY; lotY <= maxLotY; lotY++) {
+        const y = calculator.getPositionYByLotY(lotY)
+        for (let lotX = minLotX; lotX <= maxLotX; lotX++) {
+          const x = calculator.getPositionXByLotX(lotX)
+          const lotDetails: LotDetails = {
+            lotX,
+            lotY,
+            x,
+            y,
+            width: props.lotWidth,
+            height: props.lotHeight,
+          }
+          drawWater(ctx, lotDetails)
+          drawPark(ctx, lotDetails)
+          drawRoadBase(ctx, lotDetails)
+          drawRoadCorner(ctx, lotDetails)
+          drawRoadLines(ctx, lotDetails)
+
+          if (!hasRiver(lotDetails) && !hasPark(lotDetails)) {
+            ctx.fillStyle = '#ff0000'
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.font = props.lotHeight / 5 + 'px Arial'
+            ctx.fillText(
+              `${lotX},${lotY}`,
+              x + lotDetails.width / 2,
+              y + lotDetails.height / 2,
+              props.lotWidth
+            )
+          }
         }
       }
     }
   }
-}
-
-const InfrastructureLayer = (props: LayerProps): JSX.Element => {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current

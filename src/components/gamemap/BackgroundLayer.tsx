@@ -1,30 +1,28 @@
 import React, { useEffect, useRef } from 'react'
 import { LayerProps } from './LayerProps'
 
-const draw = (ctx, width, height) => {
-  if (ctx) {
-    ctx.clearRect(0, 0, width, height)
-    ctx.fillStyle = '#EDEDDD'
-    ctx.fillRect(0, 0, width, height)
-  }
-}
-
-const BackgroundLayer = ({
-  className,
-  canvasWidth,
-  canvasHeight,
-}: LayerProps): JSX.Element => {
+const BackgroundLayer = (props: LayerProps): JSX.Element => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  const drawBackground = (ctx: CanvasRenderingContext2D) => {
+    if (!ctx) return
+    ctx.fillStyle = '#EDEDDD'
+    ctx.fillRect(0, 0, props.canvasWidth, props.canvasHeight)
+  }
+
+  const draw = (ctx) => {
+    drawBackground(ctx)
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
-    canvas.width = canvasWidth
-    canvas.height = canvasHeight
-    draw(context, canvasWidth, canvasHeight)
-  }, [canvasWidth, canvasHeight])
+    canvas.width = props.canvasWidth
+    canvas.height = props.canvasHeight
+    draw(context)
+  }, [props.canvasWidth, props.canvasHeight])
 
-  return <canvas ref={canvasRef} className={className} />
+  return <canvas ref={canvasRef} className={props.className} />
 }
 
 export default BackgroundLayer

@@ -1,5 +1,5 @@
 export interface LayerProps {
-  className: string
+  className?: string
   canvasWidth: number
   canvasHeight: number
   lotWidth: number

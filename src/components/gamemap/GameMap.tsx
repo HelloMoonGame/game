@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core'
 import BackgroundLayer from './BackgroundLayer'
 import InfrastructureLayer from './InfrastructureLayer'
 import CharacterLayer from './CharacterLayer'
+import { LayerProps } from './LayerProps'
 
 const useStyles = makeStyles(() => ({
   canvas: {
@@ -16,48 +17,57 @@ const GameMap = (): JSX.Element => {
   const classes = useStyles(),
     divRef = useRef<HTMLDivElement>(null)
 
-  const [canvasWidth, setCanvasWidth] = useState(0)
-  const [canvasHeight, setCanvasHeight] = useState(0)
-  const [zoomLevel, _setZoomLevel] = useState(400)
-  const zoomLevelRef = React.useRef(zoomLevel)
-  const [minZoomLevel, _setMinZoomLevel] = useState(400)
-  const minZoomLevelRef = React.useRef(minZoomLevel)
-  const [maxZoomLevel, _setMaxZoomLevel] = useState(400)
-  const maxZoomLevelRef = React.useRef(maxZoomLevel)
+  const minZoomLevel = useRef(400)
+  const maxZoomLevel = useRef(400)
 
-  const setMinZoomLevel = (value) => {
-    _setMinZoomLevel(value)
-    minZoomLevelRef.current = value
-  }
-  const setMaxZoomLevel = (value) => {
-    _setMaxZoomLevel(value)
-    maxZoomLevelRef.current = value
+  const [layerProps, _setLayerProps] = useState<LayerProps>({
+    canvasHeight: 0,
+    canvasWidth: 0,
+    centerLotX: 0,
+    centerLotY: 0,
+    lotHeight: 400,
+    lotWidth: 400,
+  })
+
+  const setLayerProps = (values) => {
+    _setLayerProps((state) => {
+      return { ...state, ...values }
+    })
   }
 
   const setZoomLevel = (value) => {
     value = Math.ceil(
-      Math.max(
-        minZoomLevelRef.current,
-        Math.min(maxZoomLevelRef.current, value)
-      )
+      Math.max(minZoomLevel.current, Math.min(maxZoomLevel.current, value))
     )
-    _setZoomLevel(value)
-
-    zoomLevelRef.current = value
+    setLayerProps({
+      lotWidth: value,
+      lotHeight: value,
+    })
   }
 
   const resized = () => {
     const div = divRef.current
-    setCanvasWidth(div.clientWidth * 4)
-    setCanvasHeight(div.clientHeight * 4)
-    setMinZoomLevel((Math.min(div.clientWidth, div.clientHeight) / 11) * 4)
-    setMaxZoomLevel((Math.min(div.clientWidth, div.clientHeight) / 1) * 4)
-    setZoomLevel(zoomLevelRef.current)
+    minZoomLevel.current =
+      (Math.min(div.clientWidth, div.clientHeight) / 11) * 4
+    maxZoomLevel.current = (Math.min(div.clientWidth, div.clientHeight) / 1) * 4
+    setLayerProps({
+      canvasWidth: div.clientWidth * 4,
+      canvasHeight: div.clientHeight * 4,
+    })
+    setZoomLevel(layerProps.lotWidth)
   }
 
   const zoom = (event: WheelEvent) => {
     event.preventDefault()
-    setZoomLevel(zoomLevelRef.current * (event.deltaY > 0 ? 0.85 : 1.15))
+    const limit = (value) =>
+      Math.ceil(
+        Math.max(minZoomLevel.current, Math.min(maxZoomLevel.current, value))
+      )
+    _setLayerProps((state) => ({
+      ...state,
+      lotWidth: limit(state.lotWidth * (event.deltaY > 0 ? 0.85 : 1.15)),
+      lotHeight: limit(state.lotHeight * (event.deltaY > 0 ? 0.85 : 1.15)),
+    }))
   }
 
   useEffect(() => {
@@ -72,33 +82,9 @@ const GameMap = (): JSX.Element => {
 
   return (
     <>
-      <BackgroundLayer
-        className={classes.canvas}
-        canvasWidth={canvasWidth}
-        canvasHeight={canvasHeight}
-        lotWidth={zoomLevel}
-        lotHeight={zoomLevel}
-        centerLotX={0}
-        centerLotY={0}
-      />
-      <InfrastructureLayer
-        className={classes.canvas}
-        canvasWidth={canvasWidth}
-        canvasHeight={canvasHeight}
-        lotWidth={zoomLevel}
-        lotHeight={zoomLevel}
-        centerLotX={0}
-        centerLotY={0}
-      />
-      <CharacterLayer
-        className={classes.canvas}
-        canvasWidth={canvasWidth}
-        canvasHeight={canvasHeight}
-        lotWidth={zoomLevel}
-        lotHeight={zoomLevel}
-        centerLotX={0}
-        centerLotY={0}
-      />
+      <BackgroundLayer className={classes.canvas} {...layerProps} />
+      <InfrastructureLayer className={classes.canvas} {...layerProps} />
+      <CharacterLayer className={classes.canvas} {...layerProps} />
       <div className={classes.canvas} ref={divRef}></div>
     </>
   )
