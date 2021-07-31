@@ -6,4 +6,6 @@ export interface LayerProps {
   lotHeight: number
   centerLotX: number
   centerLotY: number
+  hoveredLotX?: number
+  hoveredLotY?: number
 }

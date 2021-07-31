@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core'
 import BackgroundLayer from './BackgroundLayer'
 import InfrastructureLayer from './InfrastructureLayer'
 import CharacterLayer from './CharacterLayer'
+import Calculator from './Calculator'
 import { LayerProps } from './LayerProps'
 
 const useStyles = makeStyles(() => ({
@@ -10,6 +11,7 @@ const useStyles = makeStyles(() => ({
     position: 'absolute',
     width: '100%',
     height: '100%',
+    cursor: 'pointer',
   },
 }))
 
@@ -70,6 +72,22 @@ const GameMap = (): JSX.Element => {
     }))
   }
 
+  const [mouseOffsetX, setMouseOffsetX] = useState<number>()
+  const [mouseOffsetY, setMouseOffsetY] = useState<number>()
+  const mousemove = (event: MouseEvent) => {
+    setMouseOffsetX(event.offsetX)
+    setMouseOffsetY(event.offsetY)
+  }
+  useEffect(() => {
+    const calculator = new Calculator(layerProps)
+    const lotX = calculator.getLotXByPositionX(mouseOffsetX * 4),
+      lotY = calculator.getLotYByPositionY(mouseOffsetY * 4)
+    setLayerProps({
+      hoveredLotX: lotX,
+      hoveredLotY: lotY,
+    })
+  }, [mouseOffsetX, mouseOffsetY])
+
   useEffect(() => {
     const div = divRef.current
 
@@ -77,6 +95,7 @@ const GameMap = (): JSX.Element => {
     resized()
     setZoomLevel((Math.min(div.clientWidth, div.clientHeight) / 5) * 4)
     div.onwheel = zoom
+    div.onmousemove = mousemove
     return () => window.removeEventListener('resize', resized)
   }, [])
 
