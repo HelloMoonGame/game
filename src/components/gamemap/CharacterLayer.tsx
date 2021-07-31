@@ -12,17 +12,10 @@ import {
 import { StatusCode } from 'grpc-web'
 import { useAppSelector } from '../../state/hooks'
 import { characterSelectors } from '../../state/ducks/character'
+import Calculator from './Calculator'
 
 let characters = []
 let latestProps: LayerProps
-
-const amountOfLots = (canvasLength: number, lotLength: number) =>
-  Math.ceil(canvasLength / lotLength) % 2 == 0
-    ? Math.ceil(canvasLength / lotLength) + 1
-    : Math.ceil(canvasLength / lotLength)
-
-const startPosition = (canvasLength: number, lotLength: number) =>
-  (canvasLength - amountOfLots(canvasLength, lotLength) * lotLength) / 2
 
 const redraw = (
   ctx: CanvasRenderingContext2D,
@@ -30,25 +23,19 @@ const redraw = (
   currentCharacterId: string
 ) => {
   if (ctx) {
-    const amountOfLotsX = amountOfLots(props.canvasWidth, props.lotWidth),
-      amountOfLotsY = amountOfLots(props.canvasHeight, props.lotHeight),
-      startX = startPosition(props.canvasWidth, props.lotWidth),
-      startY = startPosition(props.canvasHeight, props.lotHeight),
-      centerLotX = 0,
-      centerLotY = 0,
-      lastLotX = centerLotX + amountOfLotsX / 2 - 0.5,
-      lastLotY = centerLotY + amountOfLotsY / 2 - 0.5,
-      lotSize = Math.min(props.lotWidth, props.lotHeight)
+    const calculator = new Calculator(props),
+      minLotX = calculator.getMinLotX(),
+      minLotY = calculator.getMinLotY(),
+      maxLotX = calculator.getMaxLotX(),
+      maxLotY = calculator.getMaxLotY()
 
     latestProps = props
     ctx.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
 
-    for (let lotY = lastLotY - amountOfLotsY + 1; lotY <= lastLotY; lotY++) {
-      for (let lotX = lastLotX - amountOfLotsX + 1; lotX <= lastLotX; lotX++) {
-        const x =
-          startX + (lotX - lastLotX + amountOfLotsX - 1) * props.lotWidth
-        const y =
-          startY + (lotY - lastLotY + amountOfLotsY - 1) * props.lotHeight
+    for (let lotY = minLotY; lotY <= maxLotY; lotY++) {
+      const y = calculator.getPositionYByLotY(lotY)
+      for (let lotX = minLotX; lotX <= maxLotX; lotX++) {
+        const x = calculator.getPositionXByLotX(lotX)
 
         const charactersOnLot = characters
           .filter((c) => c.x == lotX && c.y == lotY)
@@ -56,20 +43,26 @@ const redraw = (
 
         const charactersOnLotToShow = charactersOnLot.slice(-15)
 
-        const offsetY = lotSize * (lotY % 2 === 0 ? 0.15 : 0.85)
+        const offsetY = props.lotHeight * (lotY % 2 === 0 ? 0.15 : 0.85)
 
         charactersOnLotToShow.forEach((character, index) => {
-          const characterOffset =
-            (charactersOnLotToShow.length - index + 1) * (lotSize * 0.05)
+          const characterOffsetX =
+            (charactersOnLotToShow.length - index + 1) * (props.lotWidth * 0.05)
           const offsetX =
             lotX % 2 === 0
-              ? lotSize * 0.15 + characterOffset
-              : lotSize * 0.85 - characterOffset
+              ? props.lotWidth * 0.15 + characterOffsetX
+              : props.lotWidth * 0.85 - characterOffsetX
 
           ctx.fillStyle =
             currentCharacterId === character.characterId ? '#0F0' : '#000'
           ctx.beginPath()
-          ctx.arc(x + offsetX, y + offsetY, lotSize * 0.05, 0, 2 * Math.PI)
+          ctx.arc(
+            x + offsetX,
+            y + offsetY,
+            props.lotWidth * 0.05,
+            0,
+            2 * Math.PI
+          )
           ctx.fill()
         })
 
@@ -77,15 +70,15 @@ const redraw = (
           charactersOnLot.length - charactersOnLotToShow.length
         if (charactersNotVisible > 0) {
           const offsetXForText =
-            lotX % 2 === 0 ? lotSize * 0.95 : lotSize * 0.05
+            lotX % 2 === 0 ? props.lotWidth * 0.95 : props.lotHeight * 0.05
           ctx.fillStyle = '#FFF'
-          ctx.font = lotSize * 0.075 + 'px Arial'
+          ctx.font = props.lotHeight * 0.075 + 'px Arial'
           ctx.textAlign = lotX % 2 === 0 ? 'right' : 'left'
           ctx.fillText(
             `+${charactersNotVisible}`,
             x + offsetXForText,
-            y + offsetY + lotSize * 0.025,
-            lotSize
+            y + offsetY + props.lotHeight * 0.025,
+            props.lotWidth
           )
         }
       }

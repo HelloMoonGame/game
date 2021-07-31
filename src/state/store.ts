@@ -1,14 +1,16 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
+import {
+  configureStore,
+  ThunkAction,
+  Action,
+  getDefaultMiddleware,
+} from '@reduxjs/toolkit'
 
 import * as reducers from './ducks'
 
-export function makeStore() {
-  return configureStore({
-    reducer: reducers,
-  })
-}
-
-const store = makeStore()
+const store = configureStore({
+  reducer: reducers,
+  middleware: getDefaultMiddleware(),
+})
 
 export type AppState = ReturnType<typeof store.getState>
 
