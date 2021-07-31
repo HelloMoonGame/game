@@ -5,6 +5,9 @@ import InfrastructureLayer from './InfrastructureLayer'
 import CharacterLayer from './CharacterLayer'
 import Calculator from './Calculator'
 import { LayerProps } from './LayerProps'
+import { useAppDispatch, useAppSelector } from '../../state/hooks'
+import { travelOperations } from '../../state/ducks/travel'
+import { characterSelectors } from '../../state/ducks/character'
 
 const useStyles = makeStyles(() => ({
   canvas: {
@@ -17,7 +20,9 @@ const useStyles = makeStyles(() => ({
 
 const GameMap = (): JSX.Element => {
   const classes = useStyles(),
-    divRef = useRef<HTMLDivElement>(null)
+    dispatch = useAppDispatch(),
+    divRef = useRef<HTMLDivElement>(null),
+    myCharacter = useAppSelector(characterSelectors.getMyCharacter)
 
   const minZoomLevel = useRef(400)
   const maxZoomLevel = useRef(400)
@@ -72,6 +77,16 @@ const GameMap = (): JSX.Element => {
     }))
   }
 
+  function travel() {
+    dispatch(
+      travelOperations.startTravelAsync({
+        characterId: myCharacter.id,
+        x: layerProps.hoveredLotX,
+        y: layerProps.hoveredLotY,
+      })
+    )
+  }
+
   const [mouseOffsetX, setMouseOffsetX] = useState<number>()
   const [mouseOffsetY, setMouseOffsetY] = useState<number>()
   const mousemove = (event: MouseEvent) => {
@@ -104,7 +119,7 @@ const GameMap = (): JSX.Element => {
       <BackgroundLayer className={classes.canvas} {...layerProps} />
       <InfrastructureLayer className={classes.canvas} {...layerProps} />
       <CharacterLayer className={classes.canvas} {...layerProps} />
-      <div className={classes.canvas} ref={divRef}></div>
+      <div className={classes.canvas} ref={divRef} onClick={travel}></div>
     </>
   )
 }
