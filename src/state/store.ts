@@ -2,18 +2,15 @@ import {
   configureStore,
   ThunkAction,
   Action,
-  EnhancedStore,
+  getDefaultMiddleware,
 } from '@reduxjs/toolkit'
 
 import * as reducers from './ducks'
 
-export function makeStore(): EnhancedStore {
-  return configureStore({
-    reducer: reducers,
-  })
-}
-
-const store = makeStore()
+const store = configureStore({
+  reducer: reducers,
+  middleware: getDefaultMiddleware(),
+})
 
 export type AppState = ReturnType<typeof store.getState>
 
