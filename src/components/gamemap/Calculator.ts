@@ -8,11 +8,11 @@ export default class Calculator {
   }
 
   getCenterLotPositionX(): number {
-    return this.props.canvasWidth / 2 - this.props.lotWidth / 2
+    return Math.round(this.props.canvasWidth / 2 - this.props.lotWidth / 2)
   }
 
   getCenterLotPositionY(): number {
-    return this.props.canvasHeight / 2 - this.props.lotHeight / 2
+    return Math.round(this.props.canvasHeight / 2 - this.props.lotHeight / 2)
   }
 
   getLotXByPositionX(x: number): number {
