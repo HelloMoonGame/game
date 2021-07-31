@@ -36,6 +36,8 @@ const BackgroundLayer = (props: LayerProps): JSX.Element => {
     props.canvasHeight,
     props.hoveredLotX,
     props.hoveredLotY,
+    props.lotWidth,
+    props.lotHeight,
   ])
 
   return <canvas ref={canvasRef} className={props.className} />
