@@ -7,6 +7,13 @@ import {
   characterSelectors,
   characterOperations,
 } from '../state/ducks/character'
+import { LocationClient } from '../grpc/LocationServiceClientPb'
+import {
+  Empty,
+  LocationUpdate,
+  LocationUpdateResponse,
+} from '../grpc/location_pb'
+import { StatusCode } from 'grpc-web'
 import { useAppSelector, useAppDispatch } from '../state/hooks'
 
 type Props = {
@@ -19,6 +26,34 @@ const AuthenticationCheck = ({ children }: Props): JSX.Element => {
   const myCharacter = useAppSelector(characterSelectors.getMyCharacter)
   const dispatch = useAppDispatch()
 
+  function reAuthenticate() {
+    const authService = AuthService.getInstance()
+    authService
+      .renewToken()
+      .then((newUser) => {
+        if (newUser && newUser.access_token) setUser(newUser)
+      })
+      .catch(() => {
+        authService.login()
+      })
+  }
+
+  function handleLocationUpdate(locationUpdate: LocationUpdate) {
+    if (!locationUpdate.getOnline()) {
+      dispatch(
+        characterOperations.hideCharacter(locationUpdate.getCharacterid())
+      )
+    } else {
+      dispatch(
+        characterOperations.showCharacter(
+          locationUpdate.getCharacterid(),
+          locationUpdate.getX(),
+          locationUpdate.getY()
+        )
+      )
+    }
+  }
+
   // Require login, except for authentication pages
   useEffect(() => {
     if (!router.pathname.startsWith('/auth/')) {
@@ -26,6 +61,30 @@ const AuthenticationCheck = ({ children }: Props): JSX.Element => {
       if (user == null)
         authService.getUserOrLogin().then((newUser) => setUser(newUser))
     }
+  }, [user])
+
+  useEffect(() => {
+    if (!user) return
+
+    const locationService = new LocationClient(
+      process.env.NEXT_PUBLIC_CHARACTERAPI_URL,
+      null,
+      null
+    )
+
+    const request = new Empty()
+
+    const call = locationService.subscribe(request, {
+      Authorization: 'Bearer ' + user.access_token,
+    })
+    call.on('error', function (e) {
+      if (e.code === StatusCode.UNAUTHENTICATED) {
+        reAuthenticate()
+      }
+    })
+    call.on('data', function (response: LocationUpdateResponse) {
+      response.getLocationupdatesList().forEach(handleLocationUpdate)
+    })
   }, [user])
 
   if (router.pathname.startsWith('/auth/')) return children

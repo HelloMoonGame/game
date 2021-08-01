@@ -1,4 +1,4 @@
-import { createAsyncThunk } from '@reduxjs/toolkit'
+import { createAction, createAsyncThunk } from '@reduxjs/toolkit'
 
 import * as types from './types'
 import { fetchMyCharacter, createMyCharacter } from './myCharacterAPI'
@@ -35,3 +35,27 @@ export const createMyCharacterAsync = createAsyncThunk<
     })
   }
 })
+
+export const moveMyCharacter = createAction(
+  types.MOVE_MYCHARACTER,
+  (x: number, y: number) => ({ payload: { x, y } })
+)
+
+export const addNeighbour = createAction(
+  types.ADD_NEIGHBOUR,
+  (characterId: string, x: number, y: number) => ({
+    payload: { characterId, x, y },
+  })
+)
+
+export const moveNeighbour = createAction(
+  types.MOVE_NEIGHBOUR,
+  (characterId: string, x: number, y: number) => ({
+    payload: { characterId, x, y },
+  })
+)
+
+export const deleteNeighbour = createAction(
+  types.DELETE_NEIGHBOUR,
+  (characterId: string) => ({ payload: { characterId } })
+)

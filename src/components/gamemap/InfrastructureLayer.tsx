@@ -301,7 +301,7 @@ const InfrastructureLayer = (props: LayerProps): JSX.Element => {
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
     redraw(context, props)
-  }, [props.lotWidth, props.lotHeight])
+  }, [props.lotWidth, props.lotHeight, props.centerLotX, props.centerLotY])
 
   return <canvas ref={canvasRef} className={props.className} />
 }

@@ -1,26 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { LayerProps } from './LayerProps'
-import AuthService from '../../services/AuthService'
-import { User } from 'oidc-client'
 
-import { LocationClient } from '../../grpc/LocationServiceClientPb'
-import {
-  Empty,
-  LocationUpdate,
-  LocationUpdateResponse,
-} from '../../grpc/location_pb'
-import { StatusCode } from 'grpc-web'
 import { useAppSelector } from '../../state/hooks'
 import { characterSelectors } from '../../state/ducks/character'
 import Calculator from './Calculator'
-
-let characters = []
-let latestProps: LayerProps
+import { Character } from '../../state/ducks/character/models'
 
 const redraw = (
   ctx: CanvasRenderingContext2D,
   props: LayerProps,
-  currentCharacterId: string
+  neighbours: Character[],
+  myCharacter: Character
 ) => {
   if (ctx) {
     const calculator = new Calculator(props),
@@ -29,7 +19,6 @@ const redraw = (
       maxLotX = calculator.getMaxLotX(),
       maxLotY = calculator.getMaxLotY()
 
-    latestProps = props
     ctx.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
 
     for (let lotY = minLotY; lotY <= maxLotY; lotY++) {
@@ -37,9 +26,16 @@ const redraw = (
       for (let lotX = minLotX; lotX <= maxLotX; lotX++) {
         const x = calculator.getPositionXByLotX(lotX)
 
-        const charactersOnLot = characters
-          .filter((c) => c.x == lotX && c.y == lotY)
-          .sort((a, _) => (a.characterId == currentCharacterId ? 1 : -1))
+        const charactersOnLot = neighbours.filter(
+          (c) => c.location && c.location.x == lotX && c.location.y == lotY
+        )
+        if (
+          myCharacter.location &&
+          myCharacter.location.x == lotX &&
+          myCharacter.location.y == lotY
+        ) {
+          charactersOnLot.push(myCharacter)
+        }
 
         const charactersOnLotToShow = charactersOnLot.slice(-15)
 
@@ -53,8 +49,7 @@ const redraw = (
               ? props.lotWidth * 0.15 + characterOffsetX
               : props.lotWidth * 0.85 - characterOffsetX
 
-          ctx.fillStyle =
-            currentCharacterId === character.characterId ? '#0F0' : '#000'
+          ctx.fillStyle = myCharacter === character ? '#0F0' : '#000'
           ctx.beginPath()
           ctx.arc(
             x + offsetX,
@@ -88,92 +83,29 @@ const redraw = (
 
 const CharacterLayer = (props: LayerProps): JSX.Element => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [currentUser, setCurrentUser] = useState<User>()
   const myCharacter = useAppSelector(characterSelectors.getMyCharacter)
-
-  useEffect(() => {
-    const authService = AuthService.getInstance()
-    authService.getUserOrLogin().then((user) => setCurrentUser(user))
-  }, [])
+  const neighbours = useAppSelector(characterSelectors.getNeighbours)
 
   useEffect(() => {
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
     canvas.width = props.canvasWidth
     canvas.height = props.canvasHeight
-    redraw(context, props, myCharacter?.id)
+    redraw(context, props, neighbours, myCharacter)
   }, [props.canvasWidth, props.canvasHeight])
 
   useEffect(() => {
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
-    redraw(context, props, myCharacter?.id)
-  }, [props.lotWidth, props.lotHeight, myCharacter])
-
-  function reAuthenticate() {
-    const authService = AuthService.getInstance()
-    authService
-      .renewToken()
-      .then((user) => {
-        if (user && user.access_token) setCurrentUser(user)
-      })
-      .catch(() => {
-        authService.login()
-      })
-  }
-
-  function handleLocationUpdate(locationUpdate: LocationUpdate) {
-    const current = characters.find(
-      (c) => c.characterId === locationUpdate.getCharacterid()
-    )
-    if (!locationUpdate.getOnline()) {
-      characters = characters.filter((c) => c !== current)
-    } else {
-      if (current) {
-        current.x = locationUpdate.getX()
-        current.y = locationUpdate.getY()
-      } else {
-        characters = [
-          ...characters,
-          {
-            characterId: locationUpdate.getCharacterid(),
-            x: locationUpdate.getX(),
-            y: locationUpdate.getY(),
-          },
-        ]
-      }
-    }
-  }
-
-  useEffect(() => {
-    if (!currentUser) return
-
-    const locationService = new LocationClient(
-      process.env.NEXT_PUBLIC_CHARACTERAPI_URL,
-      null,
-      null
-    )
-
-    const request = new Empty()
-
-    characters = []
-
-    const call = locationService.subscribe(request, {
-      Authorization: 'Bearer ' + currentUser.access_token,
-    })
-    call.on('error', function (e) {
-      if (e.code === StatusCode.UNAUTHENTICATED) {
-        reAuthenticate()
-      }
-    })
-    call.on('data', function (response: LocationUpdateResponse) {
-      response.getLocationupdatesList().forEach(handleLocationUpdate)
-
-      const canvas = canvasRef.current
-      const context = canvas.getContext('2d')
-      redraw(context, latestProps, myCharacter.id)
-    })
-  }, [currentUser])
+    redraw(context, props, neighbours, myCharacter)
+  }, [
+    props.lotWidth,
+    props.lotHeight,
+    props.centerLotX,
+    props.centerLotY,
+    neighbours,
+    myCharacter,
+  ])
 
   return <canvas ref={canvasRef} className={props.className} />
 }

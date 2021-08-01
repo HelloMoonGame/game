@@ -1,5 +1,6 @@
 export interface CharacterState {
   myCharacter: Character
+  neighbours: Character[]
 }
 
 enum Sex {
@@ -12,6 +13,12 @@ export interface Character {
   firstName: string
   lastName: string
   sex: Sex
+  location: LotLocation
+}
+
+export interface LotLocation {
+  x: number
+  y: number
 }
 
 export interface CreateCharacterRequest {
