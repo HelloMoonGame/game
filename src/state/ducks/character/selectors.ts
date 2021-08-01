@@ -5,4 +5,8 @@ const getMyCharacter = (state: AppState): Character => {
   return state?.character?.myCharacter
 }
 
-export default { getMyCharacter }
+const getNeighbours = (state: AppState): Character[] => {
+  return state?.character?.neighbours
+}
+
+export default { getMyCharacter, getNeighbours }
