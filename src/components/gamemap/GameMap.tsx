@@ -116,8 +116,8 @@ const GameMap = (): JSX.Element => {
 
   useEffect(() => {
     setLayerProps({
-      centerLotX: myCharacter.location?.x ?? 0,
-      centerLotY: myCharacter.location?.y ?? 0,
+      centerLotX: myCharacter?.location?.x ?? 0,
+      centerLotY: myCharacter?.location?.y ?? 0,
     })
   }, [myCharacter])
 
