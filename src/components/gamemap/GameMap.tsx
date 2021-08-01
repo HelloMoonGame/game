@@ -114,6 +114,13 @@ const GameMap = (): JSX.Element => {
     return () => window.removeEventListener('resize', resized)
   }, [])
 
+  useEffect(() => {
+    setLayerProps({
+      centerLotX: myCharacter.location?.x ?? 0,
+      centerLotY: myCharacter.location?.y ?? 0,
+    })
+  }, [myCharacter])
+
   return (
     <>
       <BackgroundLayer className={classes.canvas} {...layerProps} />
