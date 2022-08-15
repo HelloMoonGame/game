@@ -26,9 +26,3 @@ export interface CreateCharacterRequest {
   lastName: string
   sex: Sex
 }
-
-export interface ApiError<T> {
-  errorMessage: string
-  errorCode: number
-  data: T
-}

@@ -13,9 +13,3 @@ export interface StartTravelRequest {
   x: number
   y: number
 }
-
-export interface ApiError<T> {
-  errorMessage: string
-  errorCode: number
-  data: T
-}
