@@ -1,4 +1,5 @@
 import { AsyncThunk, createAsyncThunk } from '@reduxjs/toolkit'
+import { ApiError } from './apiUtils'
 
 export function createAsyncThunkApi<Returned, ThunkArg = void>(
   typePrefix: string,
@@ -21,10 +22,4 @@ export function createAsyncThunkApi<Returned, ThunkArg = void>(
       })
     }
   })
-}
-
-export interface ApiError<T> {
-  errorMessage: string
-  errorCode: number
-  data: T
 }

@@ -25,3 +25,9 @@ export async function postApi<TBody, TReturn>(
   })
   return result.data
 }
+
+export interface ApiError<T> {
+  errorMessage: string
+  errorCode: number
+  data: T
+}
