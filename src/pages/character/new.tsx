@@ -22,12 +22,10 @@ import {
   characterSelectors,
   characterOperations,
 } from '../../state/ducks/character'
-import {
-  ApiError,
-  CreateCharacterRequest,
-} from '../../state/ducks/character/models'
+import { CreateCharacterRequest } from '../../state/ducks/character/models'
 import { unwrapResult } from '@reduxjs/toolkit'
 import { useAppSelector, useAppDispatch } from '../../state/hooks'
+import { ApiError } from '../../state/utils/apiUtils'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
